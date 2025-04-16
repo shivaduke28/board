@@ -20,25 +20,48 @@ struct SrfMetaData: Codable, Identifiable {
 struct ContentView: View {
     @State private var srfMetaDatas: [SrfMetaData] = []
     var body: some View {
-        VStack(spacing: 20) {
+        VStack {
             Button("Import mp3") {
                 selectAndImportMP3()
             }
-
+            HStack {
+                Text("title").fontWeight(.bold).frame(
+                    maxWidth: .infinity,
+                    alignment: .leading
+                )
+                Text("artists").fontWeight(.bold).frame(
+                    maxWidth: .infinity,
+                    alignment: .leading
+                )
+                Text("album").fontWeight(.bold).frame(
+                    maxWidth: .infinity,
+                    alignment: .leading
+                )
+            }
+            Divider()
             ScrollView {
-                VStack(alignment: .leading) {
-                    ForEach(srfMetaDatas) { meta in
-                        Text(meta.title)
-                            .padding(.vertical, 4)
+                ForEach(srfMetaDatas) { meta in
+                    HStack {
+                        Text(meta.title).frame(
+                            maxWidth: .infinity,
+                            alignment: .leading
+                        )
+                        Text(meta.album).frame(
+                            maxWidth: .infinity,
+                            alignment: .leading
+                        )
+                        Text(meta.artists.joined(separator: ", ")).frame(
+                            maxWidth: .infinity,
+                            alignment: .leading
+                        )
                     }
                 }
-                .padding()
             }
-            .onAppear(perform: loadMetaTitles)
+            .onAppear(perform: loadLibrary)
         }
     }
 
-    func loadMetaTitles() {
+    func loadLibrary() {
         let rootURL = FileManager.default
             .homeDirectoryForCurrentUser
             .appendingPathComponent("BoardLibrary")
@@ -72,7 +95,7 @@ struct ContentView: View {
         var trackAsset = TrackAsset(
             url: url,
             artists: [],
-            title: "",
+            title: url.deletingPathExtension().lastPathComponent,
             album: ""
         )
         let commonMedataData = try await asset.load(.commonMetadata)
@@ -94,6 +117,7 @@ struct ContentView: View {
                     if let title = value {
                         trackAsset.title = title
                     }
+
                 case "albumName":
                     if let albumName = value {
                         trackAsset.album = albumName
@@ -107,6 +131,7 @@ struct ContentView: View {
                 )
             }
         }
+
         return trackAsset
     }
 
@@ -167,7 +192,7 @@ struct ContentView: View {
                     do {
                         let trackAsset = try await createTrackAsset(url: url)
                         createSrf(asset: trackAsset)
-                        loadMetaTitles()
+                        loadLibrary()
                     } catch {
                         print("エラー: \(error.localizedDescription)")
                     }
