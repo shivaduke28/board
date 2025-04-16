@@ -3,37 +3,68 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct TrackAsset: CustomStringConvertible {
+struct TrackAsset {
     var url: URL
     var artists: [String]
     var title: String
     var album: String
-    var description: String {
-        return """
-            TrackAsset(
-              path: \(url.path),
-              artists: \(artists),
-              title: \(title),
-              album: \(album),
-            )
-            """
-    }
 }
 
-struct SrfMetaData: Codable {
+struct SrfMetaData: Codable, Identifiable {
+    var id = UUID()
     let title: String
     let artists: [String]
     let album: String
 }
 
 struct ContentView: View {
+    @State private var srfMetaDatas: [SrfMetaData] = []
     var body: some View {
         VStack(spacing: 20) {
-            Button("mp3ファイルを選択") {
-                selectAndReadMP3()
+            Button("Import mp3") {
+                selectAndImportMP3()
+            }
+
+            ScrollView {
+                VStack(alignment: .leading) {
+                    ForEach(srfMetaDatas) { meta in
+                        Text(meta.title)
+                            .padding(.vertical, 4)
+                    }
+                }
+                .padding()
+            }
+            .onAppear(perform: loadMetaTitles)
+        }
+    }
+
+    func loadMetaTitles() {
+        let rootURL = FileManager.default
+            .homeDirectoryForCurrentUser
+            .appendingPathComponent("BoardLibrary")
+        var foundMeta: [SrfMetaData] = []
+        if let enumerator = FileManager.default.enumerator(
+            at: rootURL,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        ) {
+            for case let url as URL in enumerator {
+                if url.pathExtension == "srf" {
+                    let metaURL = url.appendingPathComponent("meta.json")
+                    if FileManager.default.fileExists(atPath: metaURL.path) {
+                        if let data = try? Data(contentsOf: metaURL),
+                            let meta = try? JSONDecoder().decode(
+                                SrfMetaData.self,
+                                from: data
+                            )
+                        {
+                            foundMeta.append(meta)
+                        }
+                    }
+                }
             }
         }
-        .frame(width: 300, height: 200)
+        srfMetaDatas = foundMeta
     }
 
     func createTrackAsset(url: URL) async throws -> TrackAsset {
@@ -76,7 +107,6 @@ struct ContentView: View {
                 )
             }
         }
-        print(trackAsset.description)
         return trackAsset
     }
 
@@ -126,7 +156,7 @@ struct ContentView: View {
         }
     }
 
-    func selectAndReadMP3() {
+    func selectAndImportMP3() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [UTType.mp3]
         panel.allowsMultipleSelection = false
@@ -137,6 +167,7 @@ struct ContentView: View {
                     do {
                         let trackAsset = try await createTrackAsset(url: url)
                         createSrf(asset: trackAsset)
+                        loadMetaTitles()
                     } catch {
                         print("エラー: \(error.localizedDescription)")
                     }
