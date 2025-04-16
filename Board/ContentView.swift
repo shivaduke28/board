@@ -3,21 +3,27 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct TrackMetadata: CustomStringConvertible {
-    var path: String
+struct TrackAsset: CustomStringConvertible {
+    var url: URL
     var artists: [String]
     var title: String
-    var albumName: String
+    var album: String
     var description: String {
         return """
-            TrackMetadata(
-              path: \(path),
+            TrackAsset(
+              path: \(url.path),
               artists: \(artists),
               title: \(title),
-              albumName: \(albumName)
+              album: \(album),
             )
             """
     }
+}
+
+struct SrfMetaData: Codable {
+    let title: String
+    let artists: [String]
+    let album: String
 }
 
 struct ContentView: View {
@@ -30,57 +36,110 @@ struct ContentView: View {
         .frame(width: 300, height: 200)
     }
 
+    func createTrackAsset(url: URL) async throws -> TrackAsset {
+        let asset = AVURLAsset(url: url)
+        var trackAsset = TrackAsset(
+            url: url,
+            artists: [],
+            title: "",
+            album: ""
+        )
+        let commonMedataData = try await asset.load(.commonMetadata)
+        for item in commonMedataData {
+            guard let key = item.commonKey?.rawValue else {
+                continue
+            }
+            do {
+                let value = try await item.load(.stringValue)
+                if let v = value {
+                    print(key, v)
+                }
+                switch key {
+                case "artist":
+                    if let artist = value {
+                        trackAsset.artists.append(artist)
+                    }
+                case "title":
+                    if let title = value {
+                        trackAsset.title = title
+                    }
+                case "albumName":
+                    if let albumName = value {
+                        trackAsset.album = albumName
+                    }
+                default:
+                    break
+                }
+            } catch {
+                print(
+                    "メタデータ取得エラー: \(error.localizedDescription)"
+                )
+            }
+        }
+        print(trackAsset.description)
+        return trackAsset
+    }
+
+    func createSrfMetaData(asset: TrackAsset) -> SrfMetaData {
+        SrfMetaData(
+            title: asset.title,
+            artists: asset.artists,
+            album: asset.album
+        )
+    }
+
+    func createSrf(asset: TrackAsset) {
+        let fileName = asset.url.deletingPathExtension().lastPathComponent
+        let homeDir = FileManager.default.homeDirectoryForCurrentUser
+        let boardDir = homeDir.appendingPathComponent("BoardLibrary")
+        var srfDir = boardDir
+
+        if !asset.album.isEmpty {
+            srfDir = srfDir.appendingPathComponent(asset.album)
+        } else {
+            srfDir = srfDir.appendingPathComponent("UnknownAlbum")
+        }
+
+        srfDir = srfDir.appendingPathComponent("\(fileName).srf")
+        do {
+            try FileManager.default.createDirectory(
+                at: srfDir,
+                withIntermediateDirectories: true,
+                attributes: nil
+            )
+            let destMP3 = srfDir.appendingPathComponent("\(fileName).mp3")
+            if FileManager.default.fileExists(atPath: destMP3.path) {
+                try FileManager.default.removeItem(at: destMP3)
+            }
+            try FileManager.default.copyItem(at: asset.url, to: destMP3)
+
+            let meta = createSrfMetaData(asset: asset)
+            let encoder = JSONEncoder()
+            let jsonData = try encoder.encode(meta)
+            let json = String(data: jsonData, encoding: .utf8)!
+            let metaURL = srfDir.appendingPathComponent("meta.json")
+            try json.write(to: metaURL, atomically: true, encoding: .utf8)
+            print(metaURL.path)
+            print(json)
+        } catch {
+            print("Error: \(error.localizedDescription)")
+        }
+    }
+
     func selectAndReadMP3() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [UTType.mp3]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         panel.begin { result in
-
             if result == .OK, let url = panel.url {
                 Task {
                     do {
-                        let asset = AVURLAsset(url: url)
-                        var trackMetadata = TrackMetadata(
-                            path: url.path,
-                            artists: [],
-                            title: "",
-                            albumName: ""
-                        )
-                        let commonMedataData = try await asset.load(
-                            .commonMetadata
-                        )
-                        for item in commonMedataData {
-                            guard let key = item.commonKey?.rawValue else {
-                                continue
-                            }
-                            do {
-                                let value = try await item.load(.stringValue)
-                                switch key {
-                                case "artist":
-                                    if let artist = value {
-                                        trackMetadata.artists.append(artist)
-                                    }
-                                case "title":
-                                    if let title = value {
-                                        trackMetadata.title = title
-                                    }
-                                case "albumName":
-                                    if let albumName = value {
-                                        trackMetadata.albumName = albumName
-                                    }
-                                default:
-                                    break
-                                }
-                            } catch {
-                                print("メタデータ取得エラー: \(error.localizedDescription)")
-                            }
-                        }
-                        print(trackMetadata.description)
+                        let trackAsset = try await createTrackAsset(url: url)
+                        createSrf(asset: trackAsset)
                     } catch {
                         print("エラー: \(error.localizedDescription)")
                     }
-
                 }
             }
         }
