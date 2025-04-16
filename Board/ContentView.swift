@@ -19,6 +19,7 @@ struct SrfMetaData: Codable, Identifiable {
 
 struct ContentView: View {
     @State private var srfMetaDatas: [SrfMetaData] = []
+    @State private var selectedMetaID: UUID? = nil
     var body: some View {
         VStack {
             Button("Import mp3") {
@@ -39,14 +40,10 @@ struct ContentView: View {
                 )
             }
             Divider()
-            ScrollView {
+            List(selection: $selectedMetaID) {
                 ForEach(srfMetaDatas) { meta in
                     HStack {
                         Text(meta.title).frame(
-                            maxWidth: .infinity,
-                            alignment: .leading
-                        )
-                        Text(meta.album).frame(
                             maxWidth: .infinity,
                             alignment: .leading
                         )
@@ -54,11 +51,18 @@ struct ContentView: View {
                             maxWidth: .infinity,
                             alignment: .leading
                         )
+                        Text(meta.album).frame(
+                            maxWidth: .infinity,
+                            alignment: .leading
+                        )
                     }
+                    .contentShape(Rectangle())
                 }
             }
-            .onAppear(perform: loadLibrary)
+            .listStyle(.plain)
+
         }
+        .onAppear(perform: loadLibrary)
     }
 
     func loadLibrary() {
