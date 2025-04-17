@@ -30,7 +30,16 @@ class SrfLibrary: ObservableObject {
         }
     }
 
-    func createSrf(asset: TrackAsset) {
+    func importMP3Files(_ urls: [URL]) async {
+        for url in urls {
+            if let trackAsset = try? await TrackAssetLoader.createTrackAsset(url: url) {
+                createSrf(asset: trackAsset)
+            }
+        }
+        loadLibrary()
+    }
+
+    private func createSrf(asset: TrackAsset) {
         let fileName = asset.url.deletingPathExtension().lastPathComponent
         let srfUrl =
             rootUrl
@@ -99,7 +108,7 @@ class SrfLibrary: ObservableObject {
         try encoded.write(to: dstMetaUrl)
     }
 
-    static func createSrfMetaData(asset: TrackAsset) -> SrfMetaData {
+    private static func createSrfMetaData(asset: TrackAsset) -> SrfMetaData {
         SrfMetaData(
             title: asset.title,
             artists: asset.artists,

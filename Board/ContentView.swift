@@ -73,31 +73,18 @@ struct ContentView: View {
         panel.canChooseDirectories = true
         panel.begin { result in
             guard result == .OK else { return }
-            for url in panel.urls {
+            let mp3Urls = panel.urls.flatMap { url -> [URL] in
                 if url.hasDirectoryPath {
-                    if let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: nil) {
-                        for case let fileURL as URL in enumerator {
-                            if fileURL.pathExtension.lowercased() == "mp3" {
-                                Task {
-                                    await importMP3(fileURL)
-                                }
-                            }
-                        }
-                    }
+                    return FileManager.default.enumerator(at: url, includingPropertiesForKeys: nil)?
+                        .compactMap { $0 as? URL }
+                        .filter { $0.pathExtension.lowercased() == "mp3" } ?? []
                 } else {
-                    Task {
-                        await importMP3(url)
-                    }
+                    return [url]
                 }
             }
-        }
-    }
-
-    private func importMP3(_ url: URL) async {
-        if let trackAsset = try? await TrackAssetLoader.createTrackAsset(url: url) {
-            srfLibrary.createSrf(asset: trackAsset)
-            // 複数importしたときに無駄がありそう
-            srfLibrary.loadLibrary()
+            Task {
+                await srfLibrary.importMP3Files(mp3Urls)
+            }
         }
     }
 }
