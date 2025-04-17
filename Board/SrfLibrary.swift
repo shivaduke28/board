@@ -57,6 +57,7 @@ class SrfLibrary: ObservableObject {
         guard let jsonData = json.data(using: .utf8) else {
             fatalError("文字列のData変換に失敗しました")
         }
+        // TODO: album名が変わっていたときにパスを変更する必要がある
         let meta = try JSONDecoder().decode(SrfMetaData.self, from: jsonData)
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
@@ -68,7 +69,8 @@ class SrfLibrary: ObservableObject {
         SrfMetaData(
             title: asset.title,
             artists: asset.artists,
-            album: asset.album
+            album: asset.album,
+            remixers: []
         )
     }
 }

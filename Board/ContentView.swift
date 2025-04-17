@@ -20,6 +20,7 @@ struct ContentView: View {
                 Text("title").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("artists").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("album").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
+                Text("remixers").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
             }
             Divider()
             List(selection: $selectedMetaID) {
@@ -29,6 +30,7 @@ struct ContentView: View {
                         Text(meta.title).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.artists.joined(separator: ", ")).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.album).frame(maxWidth: .infinity, alignment: .leading)
+                        Text(meta.remixers.joined(separator: ", ")).frame(maxWidth: .infinity, alignment: .leading)
                         Button("Edit", action: {
                             let url = srf.url.appendingPathComponent("meta.json")
                             editingMetaURL = url
