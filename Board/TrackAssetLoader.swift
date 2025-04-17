@@ -17,9 +17,6 @@ struct TrackAssetLoader {
             }
             do {
                 let value = try await item.load(.stringValue)
-                if let v = value {
-                    print(key, v)
-                }
                 switch key {
                 case "artist":
                     if let artist = value {
