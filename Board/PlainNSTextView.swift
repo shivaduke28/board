@@ -13,9 +13,9 @@ struct PlainNSTextView: NSViewRepresentable {
         textView.isRichText = false
         textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.isAutomaticDashSubstitutionEnabled = false
-        textView.font = NSFont.monospacedSystemFont(ofSize: 14, weight: .regular)
-        textView.backgroundColor = .textBackgroundColor
-        textView.textColor = .textColor
+        textView.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+        textView.backgroundColor = .black
+        textView.textColor = .gray
         textView.autoresizingMask = .width
         textView.allowsUndo = true
         textView.delegate = context.coordinator
