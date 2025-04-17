@@ -26,9 +26,17 @@ struct TrackListView: View {
                     HStack {
                         Text(meta.title).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.artist).frame(maxWidth: .infinity, alignment: .leading)
-                        Text(meta.artists.joined(separator: ", ")).frame(maxWidth: .infinity, alignment: .leading)
-                        Text(meta.album).frame(maxWidth: .infinity, alignment: .leading)
-                        Text(meta.remixers.joined(separator: ", ")).frame(maxWidth: .infinity, alignment: .leading)
+                        HStack {
+                            ForEach(meta.artists, id: \.self) { artist in
+                                Button(artist) {}
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        Button(meta.album) {}.frame(maxWidth: .infinity, alignment: .leading)
+                        HStack {
+                            ForEach(meta.remixers, id: \.self) { artist in
+                                Button(artist) {}
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .leading)
                         Button(
                             "Edit",
                             action: {
