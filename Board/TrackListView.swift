@@ -13,6 +13,7 @@ struct TrackListView: View {
         VStack {
             HStack {
                 Text("Title").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
+                Text("Artist").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("Artists").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("Album").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("Remixers").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
@@ -24,6 +25,7 @@ struct TrackListView: View {
                     let meta = srf.meta
                     HStack {
                         Text(meta.title).frame(maxWidth: .infinity, alignment: .leading)
+                        Text(meta.artist).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.artists.joined(separator: ", ")).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.album).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.remixers.joined(separator: ", ")).frame(maxWidth: .infinity, alignment: .leading)

@@ -29,6 +29,7 @@ class SrfLibrary: ObservableObject {
                     {
                         newSrfs.append(SrfObject(meta: meta, url: url))
                         artistSet.formUnion(meta.artists)
+                        artistSet.formUnion(meta.remixers)
                         albumSet.insert(meta.album)
                     }
                 }
@@ -122,9 +123,39 @@ class SrfLibrary: ObservableObject {
     private static func createSrfMetaData(asset: TrackAsset) -> SrfMetaData {
         SrfMetaData(
             title: asset.title,
-            artists: asset.artists,
+            artist: asset.artist,
+            artists: extractArtists(asset.artist),
             album: asset.album,
-            remixers: []
+            remixers: extractRemixers(asset.title)
         )
+    }
+
+    // TODO: titleにfeat.が入っているケースがある
+    private static func extractArtists(_ artist: String) -> [String] {
+        let pattern = "\\s*feat\\.\\s*"
+        let regex = try! NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+
+        let range = NSRange(artist.startIndex..., in: artist)
+
+        if let match = regex.firstMatch(in: artist, options: [], range: range) {
+            let matchRange = match.range
+            let firstPart = String(artist[..<artist.index(artist.startIndex, offsetBy: matchRange.lowerBound)])
+            let secondPart = String(artist[artist.index(artist.startIndex, offsetBy: matchRange.upperBound)...])
+            return [firstPart.trimmingCharacters(in: .whitespaces), secondPart.trimmingCharacters(in: .whitespaces)]
+        } else {
+            return [artist.trimmingCharacters(in: .whitespaces)]
+        }
+    }
+
+    private static func extractRemixers(_ input: String) -> [String] {
+        let pattern = "\\((.*?)\\s+(Remix|Refix|Re-fix|Rework|Bootleg|Boot|Flip)\\)"
+        let regex = try! NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        let nsrange = NSRange(input.startIndex..., in: input)
+        if let match = regex.firstMatch(in: input, options: [], range: nsrange),
+            let range = Range(match.range(at: 1), in: input)
+        {
+            return [String(input[range])]
+        }
+        return []
     }
 }

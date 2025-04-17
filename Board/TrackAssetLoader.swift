@@ -6,7 +6,7 @@ struct TrackAssetLoader {
         let asset = AVURLAsset(url: url)
         var trackAsset = TrackAsset(
             url: url,
-            artists: [],
+            artist: "",
             title: url.deletingPathExtension().lastPathComponent,
             album: ""
         )
@@ -20,7 +20,7 @@ struct TrackAssetLoader {
                 switch key {
                 case "artist":
                     if let artist = value {
-                        trackAsset.artists.append(artist)
+                        trackAsset.artist = artist
                     }
                 case "title":
                     if let title = value {

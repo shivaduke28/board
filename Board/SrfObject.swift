@@ -9,6 +9,7 @@ struct SrfObject: Identifiable {
 struct SrfMetaData: Codable, Identifiable {
     var id = UUID()
     let title: String
+    let artist: String
     let artists: [String]
     let album: String
     let remixers: [String]
