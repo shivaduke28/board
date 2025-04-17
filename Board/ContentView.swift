@@ -24,8 +24,15 @@ struct ContentView: View {
                     Spacer()
                 }.padding()
                 VStack {
-                    if selectedSideBarItem == .tracks {
+                    switch selectedSideBarItem {
+                    case .tracks:
                         TrackListView(srfLibrary: srfLibrary)
+                    case .artists:
+                        ArtistListView(srfLibrary: srfLibrary)
+                    case .albums:
+                        AlbumListView(srfLibrary: srfLibrary)
+                    case .none:
+                        EmptyView()
                     }
                 }
                 Spacer()

@@ -2,12 +2,19 @@ import Foundation
 
 class SrfLibrary: ObservableObject {
     @Published var srfs: [SrfObject] = []
+    private var artistSet: Set<String> = []
+    var artists: [String] = []
+
+    private var albumSet: Set<String> = []
+    var albums: [String] = []
 
     let rootUrl: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("BoardLibrary")
     let metaFileName = "meta.json"
 
     func loadLibrary() {
         var newSrfs: [SrfObject] = []
+        artistSet.removeAll()
+        albumSet.removeAll()
         if let enumerator = FileManager.default.enumerator(
             at: rootUrl,
             includingPropertiesForKeys: [.isDirectoryKey],
@@ -21,10 +28,14 @@ class SrfLibrary: ObservableObject {
                         let meta = try? JSONDecoder().decode(SrfMetaData.self, from: data)
                     {
                         newSrfs.append(SrfObject(meta: meta, url: url))
+                        artistSet.formUnion(meta.artists)
+                        albumSet.insert(meta.album)
                     }
                 }
             }
         }
+        artists = Array(artistSet).sorted()
+        albums = Array(albumSet).sorted()
         DispatchQueue.main.async {
             self.srfs = newSrfs
         }
