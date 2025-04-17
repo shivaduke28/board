@@ -31,12 +31,19 @@ class SrfLibrary: ObservableObject {
 
     func createSrf(asset: TrackAsset) {
         let fileName = asset.url.deletingPathExtension().lastPathComponent
-        var srfDir = rootDir
-        srfDir = srfDir.appendingPathComponent(asset.album.isEmpty ? "UnknownAlbum" : asset.album)
-        srfDir = srfDir.appendingPathComponent("\(fileName).srf")
+        let srfURL =
+            rootDir
+            .appendingPathComponent(asset.album.isEmpty ? "UnknownAlbum" : asset.album)
+            .appendingPathComponent("\(fileName).srf")
+
+        if srfs.first(where: { $0.url == srfURL }) != nil {
+            print("Skip existing srf \(srfURL).")
+            return
+        }
+
         do {
-            try FileManager.default.createDirectory(at: srfDir, withIntermediateDirectories: true, attributes: nil)
-            let destMP3 = srfDir.appendingPathComponent("\(fileName).mp3")
+            try FileManager.default.createDirectory(at: srfURL, withIntermediateDirectories: true, attributes: nil)
+            let destMP3 = srfURL.appendingPathComponent("\(fileName).mp3")
             if FileManager.default.fileExists(atPath: destMP3.path) {
                 try FileManager.default.removeItem(at: destMP3)
             }
@@ -45,7 +52,7 @@ class SrfLibrary: ObservableObject {
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted
             let jsonData = try encoder.encode(meta)
-            let metaURL = srfDir.appendingPathComponent("meta.json")
+            let metaURL = srfURL.appendingPathComponent("meta.json")
             try jsonData.write(to: metaURL)
             print(metaURL.path)
         } catch {
