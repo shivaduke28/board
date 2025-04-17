@@ -7,7 +7,7 @@ struct ContentView: View {
     @State private var selectedMetaID: UUID? = nil
 
     @State private var isEditing = false
-    @State private var editingMetaURL: URL?
+    @State private var editingMetaUrl: URL?
     @State private var editingJsonText: String = ""
     @State private var editingAlertText: String = ""
 
@@ -35,7 +35,7 @@ struct ContentView: View {
                             "Edit",
                             action: {
                                 let url = srf.url.appendingPathComponent("meta.json")
-                                editingMetaURL = url
+                                editingMetaUrl = url
                                 editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
                                 isEditing = true
                             }
@@ -53,12 +53,13 @@ struct ContentView: View {
         .sheet(isPresented: $isEditing) {
             MetaEditorView(jsonText: $editingJsonText, alertText: $editingAlertText) {
                 do {
-                    if let url = editingMetaURL {
-                        try srfLibrary.updateSrf(url: url, json: editingJsonText)
+                    if let url = editingMetaUrl {
+                        try srfLibrary.updateSrf(metaUrl: url, json: editingJsonText)
                         isEditing = false
                         srfLibrary.loadLibrary()
                     }
                 } catch {
+                    print(error.localizedDescription)
                     editingAlertText = "Save failed."
                 }
             }
