@@ -31,12 +31,15 @@ struct ContentView: View {
                         Text(meta.artists.joined(separator: ", ")).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.album).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.remixers.joined(separator: ", ")).frame(maxWidth: .infinity, alignment: .leading)
-                        Button("Edit", action: {
-                            let url = srf.url.appendingPathComponent("meta.json")
-                            editingMetaURL = url
-                            editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
-                            isEditing = true
-                        })
+                        Button(
+                            "Edit",
+                            action: {
+                                let url = srf.url.appendingPathComponent("meta.json")
+                                editingMetaURL = url
+                                editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
+                                isEditing = true
+                            }
+                        )
                         .buttonStyle(BorderlessButtonStyle())
                     }
                     .contentShape(Rectangle())
@@ -65,20 +68,35 @@ struct ContentView: View {
     private func selectAndImportMP3() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [UTType.mp3]
-        panel.allowsMultipleSelection = false
-        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = true
+        panel.canChooseDirectories = true
         panel.begin { result in
-            if result == .OK, let url = panel.url {
-                Task {
-                    do {
-                        let trackAsset = try await TrackAssetLoader.createTrackAsset(url: url)
-                        srfLibrary.createSrf(asset: trackAsset)
-                        srfLibrary.loadLibrary()
-                    } catch {
-                        print("エラー: \(error.localizedDescription)")
+            guard result == .OK else { return }
+            for url in panel.urls {
+                if url.hasDirectoryPath {
+                    if let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: nil) {
+                        for case let fileURL as URL in enumerator {
+                            if fileURL.pathExtension.lowercased() == "mp3" {
+                                Task {
+                                    await importMP3(fileURL)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Task {
+                        await importMP3(url)
                     }
                 }
             }
+        }
+    }
+
+    private func importMP3(_ url: URL) async {
+        if let trackAsset = try? await TrackAssetLoader.createTrackAsset(url: url) {
+            srfLibrary.createSrf(asset: trackAsset)
+            // 複数importしたときに無駄がありそう
+            srfLibrary.loadLibrary()
         }
     }
 }
