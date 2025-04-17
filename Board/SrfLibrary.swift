@@ -1,12 +1,12 @@
 import Foundation
 
 class SrfLibrary: ObservableObject {
-    @Published var srfMetaDatas: [SrfMetaData] = []
+    @Published var srfs: [SrfObject] = []
 
     let rootDir: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("BoardLibrary")
 
     func loadLibrary() {
-        var foundMeta: [SrfMetaData] = []
+        var newSrfs: [SrfObject] = []
         if let enumerator = FileManager.default.enumerator(
             at: rootDir,
             includingPropertiesForKeys: [.isDirectoryKey],
@@ -19,13 +19,13 @@ class SrfLibrary: ObservableObject {
                         let data = try? Data(contentsOf: metaURL),
                         let meta = try? JSONDecoder().decode(SrfMetaData.self, from: data)
                     {
-                        foundMeta.append(meta)
+                        newSrfs.append(SrfObject(meta: meta, url: url))
                     }
                 }
             }
         }
         DispatchQueue.main.async {
-            self.srfMetaDatas = foundMeta
+            self.srfs = newSrfs
         }
     }
 
@@ -43,6 +43,7 @@ class SrfLibrary: ObservableObject {
             try FileManager.default.copyItem(at: asset.url, to: destMP3)
             let meta = SrfLibrary.createSrfMetaData(asset: asset)
             let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
             let jsonData = try encoder.encode(meta)
             let metaURL = srfDir.appendingPathComponent("meta.json")
             try jsonData.write(to: metaURL)
@@ -50,6 +51,17 @@ class SrfLibrary: ObservableObject {
         } catch {
             print("Error: \(error.localizedDescription)")
         }
+    }
+
+    func updateSrf(url: URL, json: String) throws {
+        guard let jsonData = json.data(using: .utf8) else {
+            fatalError("文字列のData変換に失敗しました")
+        }
+        let meta = try JSONDecoder().decode(SrfMetaData.self, from: jsonData)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let encoded = try encoder.encode(meta)
+        try encoded.write(to: url)
     }
 
     static func createSrfMetaData(asset: TrackAsset) -> SrfMetaData {

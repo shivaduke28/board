@@ -1,10 +1,15 @@
+import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
-import AppKit
 
 struct ContentView: View {
     @StateObject private var srfLibrary = SrfLibrary()
     @State private var selectedMetaID: UUID? = nil
+
+    @State private var isEditing = false
+    @State private var editingMetaURL: URL?
+    @State private var editingJsonText: String = ""
+    @State private var editingAlertText: String = ""
 
     var body: some View {
         VStack {
@@ -18,11 +23,19 @@ struct ContentView: View {
             }
             Divider()
             List(selection: $selectedMetaID) {
-                ForEach(srfLibrary.srfMetaDatas) { meta in
+                ForEach(srfLibrary.srfs) { srf in
+                    let meta = srf.meta
                     HStack {
                         Text(meta.title).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.artists.joined(separator: ", ")).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.album).frame(maxWidth: .infinity, alignment: .leading)
+                        Button("Edit", action: {
+                            let url = srf.url.appendingPathComponent("meta.json")
+                            editingMetaURL = url
+                            editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
+                            isEditing = true
+                        })
+                        .buttonStyle(BorderlessButtonStyle())
                     }
                     .contentShape(Rectangle())
                 }
@@ -31,6 +44,19 @@ struct ContentView: View {
         }
         .onAppear {
             srfLibrary.loadLibrary()
+        }
+        .sheet(isPresented: $isEditing) {
+            MetaEditorView(jsonText: $editingJsonText, alertText: $editingAlertText) {
+                do {
+                    if let url = editingMetaURL {
+                        try srfLibrary.updateSrf(url: url, json: editingJsonText)
+                        isEditing = false
+                        srfLibrary.loadLibrary()
+                    }
+                } catch {
+                    editingAlertText = "Save failed."
+                }
+            }
         }
     }
 
