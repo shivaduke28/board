@@ -3,9 +3,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ContentView: View {
-    @StateObject private var srfLibrary = SrfLibrary()
-
-    @State private var selectedSideBarItem: SidebarItem? = .tracks
+    private var srfLibrary = SrfLibrary()
+    @State private var selectedSideBarItem: SidebarItem = .tracks
     @State private var selectedSrfObject: SrfObject?
 
     var body: some View {
@@ -33,8 +32,6 @@ struct ContentView: View {
                         ArtistListView(srfLibrary: srfLibrary)
                     case .albums:
                         AlbumListView(srfLibrary: srfLibrary)
-                    case .none:
-                        EmptyView()
                     }
                 }
                 Spacer()
