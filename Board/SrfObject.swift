@@ -1,6 +1,10 @@
 import Foundation
 
-struct SrfObject: Identifiable {
+struct SrfObject: Identifiable, Equatable {
+    static func ==(lhs: SrfObject, rhs: SrfObject) -> Bool {
+        lhs.id == rhs.id
+    }
+
     var id: UUID { meta.id }
     let meta: SrfMetaData
     var url: URL
@@ -14,4 +18,5 @@ struct SrfMetaData: Codable, Identifiable {
     let album: String
     let remixers: [String]
     let duration: Int
+    let fileName: String
 }

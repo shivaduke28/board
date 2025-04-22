@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TrackListView: View {
     @ObservedObject var srfLibrary: SrfLibrary
+    @Binding var selectedSrfObject: SrfObject?
     @State private var selectedMetaID: UUID? = nil
     @State private var isEditing = false
     @State private var editingMetaUrl: URL?
@@ -12,6 +13,7 @@ struct TrackListView: View {
     var body: some View {
         VStack {
             HStack {
+                Text("").frame(maxWidth: .infinity, alignment: .leading)
                 Text("Title").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("Artist").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("Artists").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
@@ -25,6 +27,9 @@ struct TrackListView: View {
                 ForEach(srfLibrary.srfs) { srf in
                     let meta = srf.meta
                     HStack {
+                        Button("Load") {
+                            selectedSrfObject = srf
+                        }.frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.title).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.artist).frame(maxWidth: .infinity, alignment: .leading)
                         HStack {

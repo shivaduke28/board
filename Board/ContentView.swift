@@ -6,6 +6,7 @@ struct ContentView: View {
     @StateObject private var srfLibrary = SrfLibrary()
 
     @State private var selectedSideBarItem: SidebarItem? = .tracks
+    @State private var selectedSrfObject: SrfObject?
 
     var body: some View {
         NavigationSplitView {
@@ -21,12 +22,13 @@ struct ContentView: View {
                     Button("Import mp3") {
                         selectAndImportMP3()
                     }
+                    PlayerView(selectedSrfObject: $selectedSrfObject)
                     Spacer()
                 }.padding()
                 VStack {
                     switch selectedSideBarItem {
                     case .tracks:
-                        TrackListView(srfLibrary: srfLibrary)
+                        TrackListView(srfLibrary: srfLibrary, selectedSrfObject: $selectedSrfObject)
                     case .artists:
                         ArtistListView(srfLibrary: srfLibrary)
                     case .albums:

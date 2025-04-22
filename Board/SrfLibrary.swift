@@ -127,7 +127,8 @@ class SrfLibrary: ObservableObject {
             artists: extractArtists(asset.artist),
             album: asset.album,
             remixers: extractRemixers(asset.title),
-            duration: asset.duration
+            duration: asset.duration,
+            fileName: asset.url.lastPathComponent
         )
     }
 
