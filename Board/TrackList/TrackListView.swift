@@ -1,14 +1,6 @@
 import SwiftUI
-
 struct TrackListView: View {
-    @ObservedObject var srfLibrary: SrfLibrary
-    @Binding var selectedSrfObject: SrfObject?
-    @State private var selectedMetaID: UUID? = nil
-    @State private var isEditing = false
-    @State private var editingMetaUrl: URL?
-    @State private var editingJsonText: String = ""
-    @State private var editingAlertText: String = ""
-
+    @ObservedObject var viewModel: TrackListViewModel
 
     var body: some View {
         VStack {
@@ -23,12 +15,12 @@ struct TrackListView: View {
             }
             .padding(.horizontal, 12)
             Divider()
-            List(selection: $selectedMetaID) {
-                ForEach(srfLibrary.srfs) { srf in
+            List {
+                ForEach(viewModel.srfs) { srf in
                     let meta = srf.meta
                     HStack {
                         Button("Load") {
-                            selectedSrfObject = srf
+                            viewModel.load(srf)
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.title).frame(maxWidth: .infinity, alignment: .leading)
                         Text(meta.artist).frame(maxWidth: .infinity, alignment: .leading)
@@ -44,33 +36,16 @@ struct TrackListView: View {
                             }
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         Text(TrackListView.MsToMMSS(meta.duration)).frame(maxWidth: .infinity, alignment: .leading)
-                        Button(
-                            "Edit",
-                            action: {
-                                let url = srf.url.appendingPathComponent("meta.json")
-                                editingMetaUrl = url
-                                editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
-                                isEditing = true
-                            }
-                        )
+                        Button("Edit") { viewModel.edit(srf) }
                     }
                     .contentShape(Rectangle())
                 }
             }
             .listStyle(.plain)
         }
-        .sheet(isPresented: $isEditing) {
-            MetaEditorView(jsonText: $editingJsonText, alertText: $editingAlertText) {
-                do {
-                    if let url = editingMetaUrl {
-                        try srfLibrary.updateSrf(metaUrl: url, json: editingJsonText)
-                        isEditing = false
-                        srfLibrary.loadLibrary()
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                    editingAlertText = "Save failed."
-                }
+        .sheet(isPresented: $viewModel.isEditing) {
+            MetaEditorView(jsonText: $viewModel.editingJsonText, alertText: $viewModel.editingAlertText) {
+                viewModel.save()
             }
         }
     }

@@ -12,6 +12,7 @@ class SrfLibrary: ObservableObject {
     let metaFileName = "meta.json"
 
     func loadLibrary() {
+        print("load library")
         var newSrfs: [SrfObject] = []
         artistSet.removeAll()
         albumSet.removeAll()
