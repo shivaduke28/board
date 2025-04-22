@@ -7,18 +7,21 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(SidebarItem.allCases, selection: $viewModel.selectedSideBarItem) { item in
-                Button(item.title) {
-                    viewModel.selectedSideBarItem = item
+            VStack(alignment: .leading){
+                Button("Import mp3") {
+                    viewModel.selectAndImportMP3()
+                }.padding(.horizontal)
+                Divider()
+                List(SidebarItem.allCases) { item in
+                    Button(item.title) {
+                        viewModel.selectedSideBarItem = item
+                    }
                 }
             }
             .frame(minWidth: 160)
         } detail: {
             VStack {
                 HStack {
-                    Button("Import mp3") {
-                        viewModel.selectAndImportMP3()
-                    }
                     AudioPlayerView(viewModel: viewModel.audioPlayer)
                 }.padding()
                 VStack {
