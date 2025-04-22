@@ -13,4 +13,5 @@ struct SrfMetaData: Codable, Identifiable {
     let artists: [String]
     let album: String
     let remixers: [String]
+    let duration: Int
 }

@@ -17,6 +17,7 @@ struct TrackListView: View {
                 Text("Artists").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("Album").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("Remixers").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
+                Text("Duration").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 12)
             Divider()
@@ -37,6 +38,7 @@ struct TrackListView: View {
                                 Button(artist) {}
                             }
                         }.frame(maxWidth: .infinity, alignment: .leading)
+                        Text(TrackListView.MsToMMSS(meta.duration)).frame(maxWidth: .infinity, alignment: .leading)
                         Button(
                             "Edit",
                             action: {
@@ -66,5 +68,12 @@ struct TrackListView: View {
                 }
             }
         }
+    }
+
+    private static func MsToMMSS(_ ms: Int) -> String {
+        let totalSeconds = ms / 1000
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

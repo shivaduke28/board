@@ -126,7 +126,8 @@ class SrfLibrary: ObservableObject {
             artist: asset.artist,
             artists: extractArtists(asset.artist),
             album: asset.album,
-            remixers: extractRemixers(asset.title)
+            remixers: extractRemixers(asset.title),
+            duration: asset.duration
         )
     }
 

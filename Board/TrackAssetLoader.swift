@@ -4,11 +4,13 @@ import Foundation
 struct TrackAssetLoader {
     static func createTrackAsset(url: URL) async throws -> TrackAsset {
         let asset = AVURLAsset(url: url)
+        let duration = try await asset.load(.duration)
         var trackAsset = TrackAsset(
             url: url,
             artist: "",
             title: url.deletingPathExtension().lastPathComponent,
-            album: ""
+            album: "",
+            duration: Int(CMTimeGetSeconds(duration) * 1000)
         )
         let commonMedataData = try await asset.load(.commonMetadata)
         for item in commonMedataData {

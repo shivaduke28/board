@@ -5,4 +5,5 @@ struct TrackAsset {
     var artist: String
     var title: String
     var album: String
+    let duration: Int
 }
