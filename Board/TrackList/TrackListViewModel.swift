@@ -25,6 +25,7 @@ class TrackListViewModel: ObservableObject {
 
     func load(_ srf: SrfObject) {
         audioPlayer.load(srf)
+        audioPlayer.play()
     }
 
     func edit(_ srf: SrfObject) {
