@@ -10,8 +10,10 @@ import SwiftUI
 @main
 struct BoardApp: App {
     var body: some Scene {
+        let audioPlayerModel = AudioPlayerModel()
         WindowGroup {
-            ContentView(viewModel: .init())
+            ContentView(viewModel: .init(audioPlayer: audioPlayerModel))
+                .environmentObject(audioPlayerModel)
         }
     }
 }

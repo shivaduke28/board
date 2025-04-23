@@ -2,20 +2,27 @@ import AVFAudio
 import Foundation
 import SwiftUICore
 
-class AudioPlayerViewModel: ObservableObject {
+class AudioPlayerModel: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
-    @Published var srfObject: SrfObject?
-    @Published var currentTime: Double = 0
-    @Published var duration: Double = 1
+    private var srfObject: SrfObject?
+    @Published var currentTime: TimeInterval = 0
+    @Published var duration: TimeInterval = 1
+    @Published var title: String = ""
+    @Published var artist: String = ""
+    @Published var album: String = ""
 
     private var timer: Timer?
 
     func load(_ srf: SrfObject) {
+        print("load \(srf.meta.title)")
         srfObject = srf
         audioPlayer?.stop()
         let url = srf.url.appendingPathComponent(srf.meta.fileName)
         audioPlayer = try? .init(contentsOf: url)
         duration = Double(srf.meta.duration) / 1000
+        title = srf.meta.title
+        artist = srf.meta.artist
+        album = srf.meta.album
     }
 
     func play() {
@@ -31,6 +38,11 @@ class AudioPlayerViewModel: ObservableObject {
         audioPlayer?.currentTime = 0
     }
 
+    func seek(_ time: TimeInterval) {
+        print("seek ", time)
+        audioPlayer?.currentTime = time
+        currentTime = time
+    }
     func startTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in

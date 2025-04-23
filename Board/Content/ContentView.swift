@@ -22,7 +22,7 @@ struct ContentView: View {
         } detail: {
             VStack {
                 HStack {
-                    AudioPlayerView(viewModel: viewModel.audioPlayer)
+                    AudioPlayerView()
                 }.padding()
                 VStack {
                     switch viewModel.selectedSideBarItem {
@@ -60,5 +60,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
 }
 
 #Preview {
-    ContentView(viewModel: .init())
+    let audioPlayer = AudioPlayerModel()
+    ContentView(viewModel: .init(audioPlayer: audioPlayer))
+        .environmentObject(audioPlayer)
 }

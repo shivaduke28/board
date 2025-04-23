@@ -2,7 +2,7 @@ import Combine
 import SwiftUI
 
 class TrackListViewModel: ObservableObject {
-    private let audioPlayer: AudioPlayerViewModel
+    private let audioPlayer: AudioPlayerModel
     private let srfLibrary: SrfLibrary
     @Published var isEditing = false
     @Published var editingMetaUrl: URL?
@@ -13,8 +13,8 @@ class TrackListViewModel: ObservableObject {
 
     @Published var srfs: [SrfObject] = []
 
-    init(player: AudioPlayerViewModel, srfLibrary: SrfLibrary) {
-        self.audioPlayer = player
+    init(audioPlayer: AudioPlayerModel, srfLibrary: SrfLibrary) {
+        self.audioPlayer = audioPlayer
         self.srfLibrary = srfLibrary
 
         srfLibrary.$srfs

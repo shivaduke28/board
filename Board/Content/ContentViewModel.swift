@@ -6,10 +6,9 @@ class ContentViewModel: ObservableObject {
 
     let srfLibrary = SrfLibrary()
     let trackList: TrackListViewModel
-    let audioPlayer = AudioPlayerViewModel()
 
-    init() {
-        trackList = .init(player: audioPlayer, srfLibrary: srfLibrary)
+    init(audioPlayer: AudioPlayerModel) {
+        trackList = .init(audioPlayer: audioPlayer, srfLibrary: srfLibrary)
     }
 
     @Published var selectedSideBarItem: SidebarItem = .tracks

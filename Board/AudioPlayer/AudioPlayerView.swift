@@ -1,41 +1,48 @@
-import AVFoundation
 import SwiftUI
 
 struct AudioPlayerView: View {
-    @ObservedObject var viewModel: AudioPlayerViewModel
+    @EnvironmentObject var audioPlayer: AudioPlayerModel
 
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(viewModel.srfObject?.meta.title ?? "")
+                Text(audioPlayer.title)
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .font(.headline)
-                Text(viewModel.srfObject?.meta.artist ?? "").font(.caption)
+                Text(audioPlayer.artist).font(.caption)
                     .lineLimit(1)
                     .truncationMode(.tail)
             }.frame(width: 180)
                 .padding(.horizontal)
             HStack {
-                Button("stop", systemImage: "stop.fill") { viewModel.stop() }
+                Button("stop", systemImage: "stop.fill") { audioPlayer.stop() }
                     .labelStyle(.iconOnly)
-                Button("play", systemImage: "play.fill") { viewModel.play() }
+                Button("play", systemImage: "play.fill") { audioPlayer.play() }
                     .labelStyle(.iconOnly)
-                Button("pause", systemImage: "pause.fill") { viewModel.pause() }
+                Button("pause", systemImage: "pause.fill") { audioPlayer.pause() }
                     .labelStyle(.iconOnly)
             }.padding(.horizontal)
             HStack {
-                Text(AudioPlayerView.SecToMMSS(viewModel.currentTime))
+                Text(AudioPlayerView.SecToMMSS(audioPlayer.currentTime))
                     .frame(width: 60)
-                Slider(value: $viewModel.currentTime, in: 0...viewModel.duration)
-                    .padding(.horizontal)
-                    .frame(width: 120)
-                Text(AudioPlayerView.SecToMMSS(viewModel.duration))
+                Slider(
+                    value: $audioPlayer.currentTime,
+                    in: 0...audioPlayer.duration,
+                    onEditingChanged: { editing in
+                        if !editing {
+                            audioPlayer.seek(audioPlayer.currentTime)
+                        }
+                    }
+                )
+                .padding(.horizontal)
+                .frame(width: 120)
+                Text(AudioPlayerView.SecToMMSS(audioPlayer.duration))
                     .frame(width: 60)
             }.frame(width: 200)
                 .padding(.horizontal)
         }.onAppear {
-            viewModel.startTimer()
+            audioPlayer.startTimer()
         }
     }
 
@@ -47,7 +54,7 @@ struct AudioPlayerView: View {
 }
 
 #Preview {
-    let viewModel = AudioPlayerViewModel()
+    let viewModel = AudioPlayerModel()
     let srfObject = SrfObject(
         meta: .init(
             title: "Long Long Title aaaaaaaaaaaaaaaaa",
@@ -59,5 +66,5 @@ struct AudioPlayerView: View {
             fileName: "foo.mp3"
         ), url: URL(string: "https://example.com/audio.mp3")!)
     viewModel.load(srfObject)
-    return AudioPlayerView(viewModel: viewModel)
+    return AudioPlayerView().environmentObject(viewModel)
 }
