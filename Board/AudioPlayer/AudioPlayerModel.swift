@@ -10,11 +10,11 @@ class AudioPlayerModel: ObservableObject {
     @Published var title: String = ""
     @Published var artist: String = ""
     @Published var album: String = ""
+    @Published var volume: Float = 1
 
     private var timer: Timer?
 
     func load(_ srf: SrfObject) {
-        print("load \(srf.meta.title)")
         srfObject = srf
         audioPlayer?.stop()
         let url = srf.url.appendingPathComponent(srf.meta.fileName)
@@ -23,6 +23,8 @@ class AudioPlayerModel: ObservableObject {
         title = srf.meta.title
         artist = srf.meta.artist
         album = srf.meta.album
+        audioPlayer?.volume = volume
+        currentTime = 0
     }
 
     func play() {
@@ -36,6 +38,7 @@ class AudioPlayerModel: ObservableObject {
     func stop() {
         audioPlayer?.stop()
         audioPlayer?.currentTime = 0
+        currentTime = 0
     }
 
     func seek(_ time: TimeInterval) {
@@ -43,6 +46,12 @@ class AudioPlayerModel: ObservableObject {
         audioPlayer?.currentTime = time
         currentTime = time
     }
+
+    func setVolume(_ volume: Float) {
+        self.volume = volume
+        audioPlayer?.volume = volume
+    }
+
     func startTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in

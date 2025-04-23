@@ -20,27 +20,38 @@ struct AudioPlayerView: View {
                     .labelStyle(.iconOnly)
                 Button("play", systemImage: "play.fill") { audioPlayer.play() }
                     .labelStyle(.iconOnly)
-                Button("pause", systemImage: "pause.fill") { audioPlayer.pause() }
-                    .labelStyle(.iconOnly)
+                Button("pause", systemImage: "pause.fill") {
+                    audioPlayer.pause()
+                }
+                .labelStyle(.iconOnly)
             }.padding(.horizontal)
-            HStack {
+            Slider(
+                value: $audioPlayer.currentTime,
+                in: 0...audioPlayer.duration
+            ) {
+            } minimumValueLabel: {
                 Text(AudioPlayerView.SecToMMSS(audioPlayer.currentTime))
-                    .frame(width: 60)
-                Slider(
-                    value: $audioPlayer.currentTime,
-                    in: 0...audioPlayer.duration,
-                    onEditingChanged: { editing in
-                        if !editing {
-                            audioPlayer.seek(audioPlayer.currentTime)
-                        }
-                    }
-                )
-                .padding(.horizontal)
-                .frame(width: 120)
+            } maximumValueLabel: {
                 Text(AudioPlayerView.SecToMMSS(audioPlayer.duration))
-                    .frame(width: 60)
-            }.frame(width: 200)
-                .padding(.horizontal)
+            } onEditingChanged: { editing in
+                if !editing {
+                    audioPlayer.seek(audioPlayer.currentTime)
+                }
+            }
+            .frame(width: 200)
+            .padding(.horizontal)
+            Slider(
+                value: $audioPlayer.volume,
+                in: 0...1,
+                onEditingChanged: { editing in
+                    if !editing {
+                        audioPlayer.setVolume(audioPlayer.volume)
+                    }
+                },
+                minimumValueLabel: Image(systemName: "speaker.fill"),
+                maximumValueLabel: Image(systemName: "speaker.wave.3.fill"),
+                label: { EmptyView() },
+            ).frame(width: 100).padding(.horizontal)
         }.onAppear {
             audioPlayer.startTimer()
         }
@@ -64,7 +75,9 @@ struct AudioPlayerView: View {
             remixers: [],
             duration: 321 * 1000,
             fileName: "foo.mp3"
-        ), url: URL(string: "https://example.com/audio.mp3")!)
+        ),
+        url: URL(string: "https://example.com/audio.mp3")!
+    )
     viewModel.load(srfObject)
     return AudioPlayerView().environmentObject(viewModel)
 }
