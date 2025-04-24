@@ -6,6 +6,7 @@ struct ContentView: View {
     @EnvironmentObject var trackAssetImporter: TrackAssetImporter
     @EnvironmentObject var srfLibrary: SrfLibrary
     @State private var selectedSideBarItem: SidebarItem = .tracks
+    @State private var selectedAlbumId: AlbumId?
 
     var body: some View {
         NavigationSplitView {
@@ -29,11 +30,11 @@ struct ContentView: View {
                 VStack {
                     switch selectedSideBarItem {
                     case .tracks:
-                        TrackListView()
+                        TrackListView(selectedAlbumId: $selectedAlbumId, selectedSidebarItem: $selectedSideBarItem)
                     case .artists:
                         ArtistListView()
                     case .albums:
-                        AlbumListView()
+                        AlbumListView(selectedAlbumId: $selectedAlbumId)
                     }
                 }
                 Spacer()

@@ -3,6 +3,9 @@ import SwiftUI
 struct TrackListView: View {
     @EnvironmentObject var srfLibrary: SrfLibrary
     @EnvironmentObject var audioPlayer: AudioPlayerModel
+    
+    @Binding var selectedAlbumId: AlbumId?
+    @Binding var selectedSidebarItem: SidebarItem
 
     @State private var isEditing: Bool = false
     @State private var editingMetaUrl: URL? = nil
@@ -38,7 +41,10 @@ struct TrackListView: View {
                 }
             }
             TableColumn("Album") { srf in
-                Button(srf.album.metadata.title) {}
+                Button(srf.album.metadata.title) {
+                    selectedAlbumId = srf.album.id
+                    selectedSidebarItem = .albums
+                }
             }
             TableColumn("Remixers") { srf in
                 HStack {

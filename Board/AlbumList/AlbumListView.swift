@@ -3,7 +3,7 @@ import SwiftUICore
 
 struct AlbumListView: View {
     @EnvironmentObject var srfLibrary: SrfLibrary
-    @State private var selectedAlbumId: AlbumId?
+    @Binding var selectedAlbumId: AlbumId?
 
     var albums: [Album] {
         Array(srfLibrary.albums.values)
@@ -11,10 +11,16 @@ struct AlbumListView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(albums, id: \.id, selection: $selectedAlbumId) { album in
-                VStack(alignment: .leading) {
-                    Text(album.metadata.title).font(.headline)
-                    Text(album.metadata.artist).font(.caption)
+            ScrollViewReader { proxy in
+                List(albums, id: \.id, selection: $selectedAlbumId) { album in
+                    VStack(alignment: .leading) {
+                        Text(album.metadata.title).font(.headline)
+                        Text(album.metadata.artist).font(.caption)
+                    }.id(album.id)
+                }.onAppear {
+                    if let id = selectedAlbumId {
+                        proxy.scrollTo(id, anchor: .center)
+                    }
                 }
             }
         } detail: {
