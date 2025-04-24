@@ -40,6 +40,13 @@ struct TrackListView: View {
             TableColumn("Album") { srf in
                 Button(srf.album.metadata.title) {}
             }
+            TableColumn("Remixers") { srf in
+                HStack {
+                    ForEach(srf.metadata.remixers, id: \.self) { artist in
+                        Button(artist) {}
+                    }
+                }
+            }
             TableColumn("Duration") { srf in
                 Text(srf.metadata.duration.mmss)
             }.width(60)

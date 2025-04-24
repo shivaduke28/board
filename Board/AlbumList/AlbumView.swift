@@ -63,6 +63,13 @@ struct AlbumView: View {
                         }
                     }
                 }
+                TableColumn("Remixers") { srf in
+                    HStack {
+                        ForEach(srf.metadata.remixers, id: \.self) { artist in
+                            Button(artist) {}
+                        }
+                    }
+                }
                 TableColumn("Duration") { srf in
                     Text(srf.metadata.duration.mmss)
                 }.width(60)
