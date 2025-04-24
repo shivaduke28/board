@@ -12,9 +12,9 @@ struct AlbumListView: View {
             .padding(.horizontal, 12)
             Divider()
             List {
-                ForEach(srfLibrary.albums, id: \.self) { album in
+                ForEach(srfLibrary.albums.sorted(by: {$0.value.metadata.title < $1.value.metadata.title}), id: \.value.id) { _, album in
                     HStack {
-                        Button(album) {}
+                        Button(album.metadata.title) {}
                         Spacer()
                     }
                 }

@@ -11,7 +11,7 @@ class TrackListViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
-    @Published var srfs: [SrfObject] = []
+    @Published var srfs: [Srf] = []
 
     init(audioPlayer: AudioPlayerModel, srfLibrary: SrfLibrary) {
         self.audioPlayer = audioPlayer
@@ -19,17 +19,17 @@ class TrackListViewModel: ObservableObject {
 
         srfLibrary.$srfs
             .receive(on: DispatchQueue.main)
-            .assign(to: \.srfs, on: self)
+            .sink(receiveValue: { self.srfs = Array($0.values) })
             .store(in: &cancellables)
     }
 
-    func load(_ srf: SrfObject) {
+    func load(_ srf: Srf) {
         audioPlayer.load(srf)
         audioPlayer.play()
     }
 
-    func edit(_ srf: SrfObject) {
-        let url = srf.url.appendingPathComponent("meta.json")
+    func edit(_ srf: Srf) {
+        let url = srf.url.appendingPathComponent(SrfLibrary.srfMetaFileName)
         editingMetaUrl = url
         editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
         isEditing = true

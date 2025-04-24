@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TrackListItemView: View {
-    let srf: SrfObject
+    let srf: Srf
     let viewModel: TrackListViewModel
 
     var body: some View {
@@ -13,20 +13,20 @@ struct TrackListItemView: View {
             }
             .buttonStyle(PlainButtonStyle())
             .frame(width: 20)
-            Text(srf.meta.title).frame(maxWidth: .infinity, alignment: .leading)
-            Text(srf.meta.artist).frame(maxWidth: .infinity, alignment: .leading)
+            Text(srf.metadata.title).frame(maxWidth: .infinity, alignment: .leading)
+            Text(srf.metadata.artist).frame(maxWidth: .infinity, alignment: .leading)
             HStack {
-                ForEach(srf.meta.artists, id: \.self) { artist in
+                ForEach(srf.metadata.artists, id: \.self) { artist in
                     Button(artist) {}
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)
-            Button(srf.meta.album) {}.frame(maxWidth: .infinity, alignment: .leading)
+            Button(srf.album.metadata.title) {}.frame(maxWidth: .infinity, alignment: .leading)
             HStack {
-                ForEach(srf.meta.remixers, id: \.self) { artist in
+                ForEach(srf.metadata.remixers, id: \.self) { artist in
                     Button(artist) {}
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)
-            Text(TrackListView.MsToMMSS(srf.meta.duration)).frame(width: 60, alignment: .leading)
+            Text(srf.metadata.duration.mmss).frame(width: 60, alignment: .leading)
             Button(action: {
                 viewModel.edit(srf)
             }) {

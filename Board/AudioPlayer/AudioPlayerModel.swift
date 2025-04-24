@@ -4,7 +4,7 @@ import SwiftUICore
 
 class AudioPlayerModel: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
-    private var srfObject: SrfObject?
+    private var srfObject: Srf?
     @Published var currentTime: TimeInterval = 0
     @Published var duration: TimeInterval = 1
     @Published var title: String = ""
@@ -14,15 +14,15 @@ class AudioPlayerModel: ObservableObject {
 
     private var timer: Timer?
 
-    func load(_ srf: SrfObject) {
+    func load(_ srf: Srf) {
         srfObject = srf
         audioPlayer?.stop()
-        let url = srf.url.appendingPathComponent(srf.meta.fileName)
+        let url = srf.url.appendingPathComponent(srf.assetFileName)
         audioPlayer = try? .init(contentsOf: url)
-        duration = Double(srf.meta.duration) / 1000
-        title = srf.meta.title
-        artist = srf.meta.artist
-        album = srf.meta.album
+        duration = srf.metadata.duration
+        title = srf.metadata.title
+        artist = srf.metadata.artist
+        album = srf.album.metadata.title
         audioPlayer?.volume = volume
         currentTime = 0
     }

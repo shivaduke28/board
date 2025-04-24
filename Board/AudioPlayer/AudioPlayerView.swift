@@ -30,9 +30,9 @@ struct AudioPlayerView: View {
                 in: 0...audioPlayer.duration
             ) {
             } minimumValueLabel: {
-                Text(AudioPlayerView.SecToMMSS(audioPlayer.currentTime))
+                Text(audioPlayer.currentTime.mmss)
             } maximumValueLabel: {
-                Text(AudioPlayerView.SecToMMSS(audioPlayer.duration))
+                Text(audioPlayer.duration.mmss)
             } onEditingChanged: { editing in
                 if !editing {
                     audioPlayer.seek(audioPlayer.currentTime)
@@ -56,27 +56,29 @@ struct AudioPlayerView: View {
             audioPlayer.startTimer()
         }
     }
-
-    private static func SecToMMSS(_ sec: Double) -> String {
-        let minutes = Int(sec / 60)
-        let seconds = Int(sec) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
 }
 
 #Preview {
     let viewModel = AudioPlayerModel()
-    let srfObject = SrfObject(
-        meta: .init(
-            title: "Long Long Title aaaaaaaaaaaaaaaaa",
-            artist: "Long Long Artist Nameeeeeaaaaaaaaaaaae",
-            artists: ["Test Artist"],
-            album: "Test Album",
-            remixers: [],
-            duration: 321 * 1000,
-            fileName: "foo.mp3"
+    let srfMeta = SrfMetadata(
+        title: "long long title",
+        artist: "long long artist name",
+        artists: ["Test Artist"],
+        remixers: ["Test remixer"],
+        duration: 100
+    )
+    let srfObject = Srf(
+        metadata: srfMeta,
+        album: Album(
+            metadata: .init(
+                title: "title",
+                artist: "artist",
+                artists: ["artist"]
+            ),
+            url: URL(string: "foo")!
         ),
-        url: URL(string: "https://example.com/audio.mp3")!
+        url: URL(string: "https://example.com/audio.mp3")!,
+        assetFileName: "audio.mp3"
     )
     viewModel.load(srfObject)
     return AudioPlayerView().environmentObject(viewModel)

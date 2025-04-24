@@ -12,7 +12,7 @@ struct ArtistListView: View {
             .padding(.horizontal, 12)
             Divider()
             List {
-                ForEach(srfLibrary.artists, id: \.self) { artist in
+                ForEach(Array(srfLibrary.artists), id: \.self) { artist in
                     HStack {
                         Button(artist) {}
                         Spacer()
