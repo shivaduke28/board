@@ -11,9 +11,11 @@ import SwiftUI
 struct BoardApp: App {
     var body: some Scene {
         let audioPlayerModel = AudioPlayerModel()
+        let srfLibrary = SrfLibrary()
         WindowGroup {
-            ContentView(viewModel: .init(audioPlayer: audioPlayerModel))
+            ContentView(viewModel: .init(srfLibrary: srfLibrary, audioPlayer: audioPlayerModel))
                 .environmentObject(audioPlayerModel)
+                .environmentObject(srfLibrary)
         }
     }
 }

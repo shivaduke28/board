@@ -29,9 +29,9 @@ struct ContentView: View {
                     case .tracks:
                         TrackListView(viewModel: viewModel.trackList)
                     case .artists:
-                        ArtistListView(srfLibrary: viewModel.srfLibrary)
+                        ArtistListView()
                     case .albums:
-                        AlbumListView(srfLibrary: viewModel.srfLibrary)
+                        AlbumListView()
                     }
                 }
                 Spacer()
@@ -61,6 +61,8 @@ enum SidebarItem: String, CaseIterable, Identifiable {
 
 #Preview {
     let audioPlayer = AudioPlayerModel()
-    ContentView(viewModel: .init(audioPlayer: audioPlayer))
+    let srfLibrary = SrfLibrary()
+    ContentView(viewModel: .init(srfLibrary: srfLibrary, audioPlayer: audioPlayer))
         .environmentObject(audioPlayer)
+        .environmentObject(srfLibrary)
 }

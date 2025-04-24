@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftUICore
 
 struct AlbumListView: View {
-    @ObservedObject var srfLibrary: SrfLibrary
+    @EnvironmentObject var srfLibrary: SrfLibrary
 
     var body: some View {
         VStack {

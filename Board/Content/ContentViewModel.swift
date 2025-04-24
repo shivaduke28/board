@@ -4,10 +4,11 @@ import UniformTypeIdentifiers
 
 class ContentViewModel: ObservableObject {
 
-    let srfLibrary = SrfLibrary()
+    let srfLibrary: SrfLibrary
     let trackList: TrackListViewModel
 
-    init(audioPlayer: AudioPlayerModel) {
+    init(srfLibrary: SrfLibrary, audioPlayer: AudioPlayerModel) {
+        self.srfLibrary = srfLibrary
         trackList = .init(audioPlayer: audioPlayer, srfLibrary: srfLibrary)
     }
 
