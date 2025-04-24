@@ -27,7 +27,7 @@ struct ContentView: View {
                 VStack {
                     switch viewModel.selectedSideBarItem {
                     case .tracks:
-                        TrackListView(viewModel: viewModel.trackList)
+                        TrackListView()
                     case .artists:
                         ArtistListView()
                     case .albums:

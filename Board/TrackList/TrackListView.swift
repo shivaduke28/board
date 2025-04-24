@@ -1,14 +1,23 @@
 import SwiftUI
 
 struct TrackListView: View {
-    @ObservedObject var viewModel: TrackListViewModel
-    @State private var hoveredId: UUID? = nil
+    @EnvironmentObject var srfLibrary: SrfLibrary
+    @EnvironmentObject var audioPlayer: AudioPlayerModel
+
+    @State private var isEditing: Bool = false
+    @State private var editingMetaUrl: URL? = nil
+    @State private var editingJsonText: String = ""
+
+    var srfs: [Srf] {
+        Array(srfLibrary.srfs.values)
+    }
 
     var body: some View {
-        Table(viewModel.srfs) {
+        Table(srfs) {
             TableColumn("") { srf in
                 Button {
-                    viewModel.load(srf)
+                    audioPlayer.load(srf)
+                    audioPlayer.play()
                 } label: {
                     Label("", systemImage: "play.fill").labelStyle(.iconOnly)
                 }
@@ -39,7 +48,7 @@ struct TrackListView: View {
             }.width(60)
             TableColumn("") { srf in
                 Button {
-                    viewModel.edit(srf)
+                    edit(srf: srf)
                 } label: {
                     Label("", systemImage: "pencil").labelStyle(.iconOnly)
                 }
@@ -48,13 +57,19 @@ struct TrackListView: View {
             }.width(20)
         }
 
-        .sheet(isPresented: $viewModel.isEditing) {
+        .sheet(isPresented: $isEditing) {
             MetaEditorView(
-                jsonText: $viewModel.editingJsonText,
-                alertText: $viewModel.editingAlertText
-            ) {
-                viewModel.save()
-            }
+                isPresented: $isEditing,
+                editingJsonText: $editingJsonText,
+                editingMetaUrl: $editingMetaUrl
+            )
         }
+    }
+
+    private func edit(srf: Srf) {
+        let url = srf.url.appendingPathComponent(SrfLibrary.srfMetaFileName)
+        editingMetaUrl = url
+        editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
+        isEditing = true
     }
 }

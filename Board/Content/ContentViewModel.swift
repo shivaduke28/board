@@ -5,11 +5,9 @@ import UniformTypeIdentifiers
 class ContentViewModel: ObservableObject {
 
     let srfLibrary: SrfLibrary
-    let trackList: TrackListViewModel
 
     init(srfLibrary: SrfLibrary, audioPlayer: AudioPlayerModel) {
         self.srfLibrary = srfLibrary
-        trackList = .init(audioPlayer: audioPlayer, srfLibrary: srfLibrary)
     }
 
     @Published var selectedSideBarItem: SidebarItem = .tracks
