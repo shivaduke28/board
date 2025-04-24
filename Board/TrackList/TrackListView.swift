@@ -56,7 +56,6 @@ struct TrackListView: View {
                 .frame(width: 20)
             }.width(20)
         }
-
         .sheet(isPresented: $isEditing) {
             MetaEditorView(
                 isPresented: $isEditing,

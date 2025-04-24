@@ -12,7 +12,11 @@ struct MetaEditorView: View {
         do {
             if let url = editingMetaUrl {
                 try srfLibrary.updateSrf(metaUrl: url, json: editingJsonText)
+                // FIXME: これで全てがリフレッシュされてしまいAlbumViewが初期化されてしまう...
                 srfLibrary.loadLibrary()
+                editingAlertText = ""
+                editingMetaUrl = nil
+                isPresented = false
             }
         } catch {
             print(error.localizedDescription)
@@ -22,7 +26,7 @@ struct MetaEditorView: View {
 
     var body: some View {
         VStack {
-            Text("Edit meta.json")
+            Text("Edit Meta File")
                 .font(.headline)
             Text(editingAlertText)
                 .foregroundColor(.red)
