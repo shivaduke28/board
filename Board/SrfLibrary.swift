@@ -7,8 +7,8 @@ class SrfLibrary: ObservableObject {
 
     static let albumFileExtension: String = "srfa"
     static let srfFileExtension: String = "srf"
-    static let albumMetaFileName = "meta.json"
-    static let srfMetaFileName = "meta.json"
+    static let albumMetaFileName = "srfa.json"
+    static let srfMetaFileName = "srf.json"
 
     let emptyAlbumName = "Unknown"
     let emptyArtistName = "Unknown"
@@ -134,7 +134,8 @@ class SrfLibrary: ObservableObject {
         let albumMeta = AlbumMetadata(
             title: asset.album ?? emptyAlbumName,
             artist: artist,
-            artists: [artist]
+            artists: [artist],
+            year: asset.year
         )
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted

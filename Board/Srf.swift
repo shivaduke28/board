@@ -33,6 +33,7 @@ struct AlbumMetadata: Codable {
     let title: String
     let artist: String
     let artists: [String]
+    let year: Int?
 
     func directoryName() -> String {
         "\(artist) - \(title)"

@@ -73,7 +73,8 @@ struct AudioPlayerView: View {
             metadata: .init(
                 title: "title",
                 artist: "artist",
-                artists: ["artist"]
+                artists: ["artist"],
+                year: 1990
             ),
             url: URL(string: "foo")!
         ),

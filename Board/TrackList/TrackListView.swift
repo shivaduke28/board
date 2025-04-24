@@ -14,6 +14,7 @@ struct TrackListView: View {
                 Text("Album").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("Remixers").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
                 Text("Duration").fontWeight(.bold).frame(width: 60, alignment: .leading)
+                Text("Year").fontWeight(.bold).frame(width: 60, alignment: .leading)
                 Text("").fontWeight(.bold).frame(width: 20)
             }
             .padding(.horizontal, 12)

@@ -27,6 +27,7 @@ struct TrackListItemView: View {
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)
             Text(srf.metadata.duration.mmss).frame(width: 60, alignment: .leading)
+            Text(srf.album.metadata.year != nil ? String(srf.album.metadata.year!) : "").frame(width: 60, alignment: .leading)
             Button(action: {
                 viewModel.edit(srf)
             }) {

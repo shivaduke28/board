@@ -7,6 +7,7 @@ struct TrackAsset {
     let album: String?
     let duration: TimeInterval
     let albumArtist: String?
+    let year: Int?
 
     static func createFromMp3(url: URL) async throws -> TrackAsset {
         let asset = AVURLAsset(url: url)
@@ -14,35 +15,36 @@ struct TrackAsset {
             try await asset.load(.duration)
         )
 
-        print("----\(url.lastPathComponent)----")
-
         var artist: String? = nil
         var title: String? = nil
         var album: String? = nil
         var albumArtist: String? = nil
+        var year: Int? = nil
 
-        for item in asset.commonMetadata {
-            print(item.keySpace, item.identifier ?? "", item.commonKey ?? "", item.key ?? "",  item.value ?? "")
+        // metadataとしては取得できないがcommonMetadataで取得できるケースがあるのでこちらを優先する
+        let commonMedadata = try await asset.load(.commonMetadata)
+        for item in commonMedadata {
+            switch item.commonKey {
+            case AVMetadataKey.commonKeyTitle:
+                title = try await item.load(.stringValue)
+            case AVMetadataKey.commonKeyArtist:
+                artist = try await item.load(.stringValue)
+            case AVMetadataKey.commonKeyAlbumName:
+                album = try await item.load(.stringValue)
+            default:
+                break
+            }
         }
-
-        print("--id3")
 
         let id3Metadata = try await asset.loadMetadata(for: .id3Metadata)
         for item in id3Metadata {
-            guard let key = item.key as? String else { continue }
-            guard let value = try await item.load(.stringValue) else {
-                continue
-            }
-            print(key, value)
+            guard let key = item.key as? AVMetadataKey else { continue }
             switch key {
-            case "TIT2":
-                title = value
-            case "TPE1":
-                artist = value
-            case "TPE2":
-                albumArtist = value
-            case "TALB":
-                album = value
+            case AVMetadataKey.id3MetadataKeyBand:
+                albumArtist = try await item.load(.stringValue)
+            case AVMetadataKey.id3MetadataKeyYear,
+                AVMetadataKey.id3MetadataKeyRecordingTime:
+                year = try await item.load(.stringValue).flatMap(Int.init)
             default:
                 break
             }
@@ -54,7 +56,8 @@ struct TrackAsset {
             title: title,
             album: album,
             duration: duration,
-            albumArtist: albumArtist
+            albumArtist: albumArtist,
+            year: year
         )
     }
 }
