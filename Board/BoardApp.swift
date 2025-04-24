@@ -12,10 +12,12 @@ struct BoardApp: App {
     var body: some Scene {
         let audioPlayerModel = AudioPlayerModel()
         let srfLibrary = SrfLibrary()
+        let trackAssetImporter = TrackAssetImporter(srfLibrary: srfLibrary)
         WindowGroup {
-            ContentView(viewModel: .init(srfLibrary: srfLibrary, audioPlayer: audioPlayerModel))
+            ContentView()
                 .environmentObject(audioPlayerModel)
                 .environmentObject(srfLibrary)
+                .environmentObject(trackAssetImporter)
         }
     }
 }

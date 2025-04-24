@@ -15,6 +15,7 @@ class SrfLibrary: ObservableObject {
     let rootUrl: URL = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent("BoardLibrary")
 
+    @MainActor
     func loadLibrary() {
         var newSrfs: [SrfId: Srf] = [:]
         var newAlbums: [AlbumId: Album] = [:]
@@ -99,17 +100,12 @@ class SrfLibrary: ObservableObject {
         .lastPathComponent
     }
 
-    func importMP3Files(_ urls: [URL]) async {
-        for url in urls {
-            do {
-                let trackAsset = try await TrackAsset.createFromMp3(url: url)
-                try createSrf(trackAsset)
-            } catch {
-                print(url.lastPathComponent)
-                print(error.localizedDescription)
-            }
+    func importTrackAsset(_ asset: TrackAsset) async {
+        do {
+            try createSrf(asset)
+        } catch {
+            print(error.localizedDescription)
         }
-        loadLibrary()
     }
 
     private func getOrCreateAlbum(asset: TrackAsset) throws -> Album {

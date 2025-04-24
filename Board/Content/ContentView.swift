@@ -3,18 +3,20 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ContentView: View {
-    @ObservedObject var viewModel: ContentViewModel
+    @EnvironmentObject var trackAssetImporter: TrackAssetImporter
+    @EnvironmentObject var srfLibrary: SrfLibrary
+    @State private var selectedSideBarItem: SidebarItem = .tracks
 
     var body: some View {
         NavigationSplitView {
             VStack(alignment: .leading) {
                 Button("Import mp3") {
-                    viewModel.selectAndImportMP3()
+                    trackAssetImporter.selectAndImportMP3()
                 }.padding(.horizontal)
                 Divider()
                 List(SidebarItem.allCases) { item in
                     Button(item.title) {
-                        viewModel.selectedSideBarItem = item
+                        selectedSideBarItem = item
                     }
                 }
             }
@@ -25,7 +27,7 @@ struct ContentView: View {
                     AudioPlayerView()
                 }.padding()
                 VStack {
-                    switch viewModel.selectedSideBarItem {
+                    switch selectedSideBarItem {
                     case .tracks:
                         TrackListView()
                     case .artists:
@@ -38,7 +40,7 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            viewModel.loadLibrary()
+            srfLibrary.loadLibrary()
         }
 
     }
@@ -61,9 +63,9 @@ enum SidebarItem: String, CaseIterable, Identifiable {
 #Preview {
     let audioPlayer = AudioPlayerModel()
     let srfLibrary = SrfLibrary()
-    ContentView(
-        viewModel: .init(srfLibrary: srfLibrary, audioPlayer: audioPlayer)
-    )
+    let trackAssetImporter = TrackAssetImporter(srfLibrary: srfLibrary)
+    ContentView()
     .environmentObject(audioPlayer)
     .environmentObject(srfLibrary)
+    .environmentObject(trackAssetImporter)
 }
