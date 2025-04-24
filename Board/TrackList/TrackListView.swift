@@ -5,35 +5,56 @@ struct TrackListView: View {
     @State private var hoveredId: UUID? = nil
 
     var body: some View {
-        VStack {
-            HStack {
-                Text("").fontWeight(.bold).frame(width: 20)
-                Text("Title").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
-                Text("Artist").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
-                Text("Artists").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
-                Text("Album").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
-                Text("Remixers").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)
-                Text("Duration").fontWeight(.bold).frame(width: 60, alignment: .leading)
-                Text("Year").fontWeight(.bold).frame(width: 60, alignment: .leading)
-                Text("").fontWeight(.bold).frame(width: 20)
+        Table(viewModel.srfs) {
+            TableColumn("") { srf in
+                Button {
+                    viewModel.load(srf)
+                } label: {
+                    Label("", systemImage: "play.fill").labelStyle(.iconOnly)
+                }
+                .buttonStyle(.plain)
+                .frame(width: 20)
+            }.width(20)
+            TableColumn("Title") { srf in
+                Text(srf.metadata.title)
             }
-            .padding(.horizontal, 12)
-            Divider()
-            List(viewModel.srfs) { srf in
-                TrackListItemView(srf: srf, viewModel: viewModel)
+            TableColumn("Artist") { srf in
+                Text(srf.metadata.artist)
             }
+            TableColumn("Artists") { srf in
+                HStack {
+                    ForEach(srf.metadata.artists, id: \.self) { artist in
+                        Button(artist) {}
+                    }
+                }
+            }
+            TableColumn("Album") { srf in
+                Button(srf.album.metadata.title) {}
+            }
+            TableColumn("Duration") { srf in
+                Text(srf.metadata.duration.mmss)
+            }.width(60)
+            TableColumn("Year") { srf in
+                Text(srf.album.metadata.year.map(String.init) ?? "")
+            }.width(60)
+            TableColumn("") { srf in
+                Button {
+                    viewModel.edit(srf)
+                } label: {
+                    Label("", systemImage: "pencil").labelStyle(.iconOnly)
+                }
+                .buttonStyle(.plain)
+                .frame(width: 20)
+            }.width(20)
         }
-        .listStyle(.plain)
+
         .sheet(isPresented: $viewModel.isEditing) {
-            MetaEditorView(jsonText: $viewModel.editingJsonText, alertText: $viewModel.editingAlertText) {
+            MetaEditorView(
+                jsonText: $viewModel.editingJsonText,
+                alertText: $viewModel.editingAlertText
+            ) {
                 viewModel.save()
             }
         }
-    }
-    static func MsToMMSS(_ ms: Int) -> String {
-        let totalSeconds = ms / 1000
-        let minutes = totalSeconds / 60
-        let seconds = totalSeconds % 60
-        return String(format: "%02d:%02d", minutes, seconds)
     }
 }
