@@ -10,6 +10,7 @@ struct AlbumListView: View {
     }
 
     var body: some View {
+        let _ = Self._printChanges()
         NavigationSplitView {
             ScrollViewReader { proxy in
                 List(albums, id: \.id, selection: $selectedAlbumId) { album in

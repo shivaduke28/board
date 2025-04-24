@@ -5,6 +5,7 @@ struct ArtistListView: View {
     @EnvironmentObject var srfLibrary: SrfLibrary
 
     var body: some View {
+        let _ = Self._printChanges()
         VStack {
             HStack {
                 Text("Artist").fontWeight(.bold).frame(maxWidth: .infinity, alignment: .leading)

@@ -17,6 +17,7 @@ struct TrackListView: View {
     }
 
     var body: some View {
+        let _ = Self._printChanges()
         Table(srfs) {
             TableColumn("") { srf in
                 Button {
