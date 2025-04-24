@@ -7,7 +7,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            VStack(alignment: .leading){
+            VStack(alignment: .leading) {
                 Button("Import mp3") {
                     viewModel.selectAndImportMP3()
                 }.padding(.horizontal)
@@ -43,7 +43,6 @@ struct ContentView: View {
 
     }
 
-
 }
 
 // サイドバーの項目定義
@@ -62,7 +61,9 @@ enum SidebarItem: String, CaseIterable, Identifiable {
 #Preview {
     let audioPlayer = AudioPlayerModel()
     let srfLibrary = SrfLibrary()
-    ContentView(viewModel: .init(srfLibrary: srfLibrary, audioPlayer: audioPlayer))
-        .environmentObject(audioPlayer)
-        .environmentObject(srfLibrary)
+    ContentView(
+        viewModel: .init(srfLibrary: srfLibrary, audioPlayer: audioPlayer)
+    )
+    .environmentObject(audioPlayer)
+    .environmentObject(srfLibrary)
 }
