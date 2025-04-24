@@ -15,10 +15,10 @@ class SrfLibrary: ObservableObject {
     let rootUrl: URL = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent("BoardLibrary")
 
-    @MainActor
     func loadLibrary() {
         var newSrfs: [SrfId: Srf] = [:]
         var newAlbums: [AlbumId: Album] = [:]
+        var newArtists: Set<String> = []
         do {
             // rootの下にアルバムが入っている前提
             let urls = try FileManager.default.contentsOfDirectory(
@@ -27,7 +27,7 @@ class SrfLibrary: ObservableObject {
             )
             for url in urls {
                 if url.pathExtension == SrfLibrary.albumFileExtension {
-                    loadAlbum(url: url, albums: &newAlbums, srfs: &newSrfs)
+                    loadAlbum(url: url, albums: &newAlbums, srfs: &newSrfs, artists: &newArtists)
                 }
             }
         } catch {
@@ -37,6 +37,7 @@ class SrfLibrary: ObservableObject {
         DispatchQueue.main.async {
             self.albums = newAlbums
             self.srfs = newSrfs
+            self.artists = newArtists
         }
     }
 
@@ -44,7 +45,8 @@ class SrfLibrary: ObservableObject {
     func loadAlbum(
         url: URL,
         albums: inout [AlbumId: Album],
-        srfs: inout [SrfId: Srf]
+        srfs: inout [SrfId: Srf],
+        artists: inout Set<String>
     ) {
         do {
             let albumMetaUrl = url.appendingPathComponent(

@@ -1,23 +1,41 @@
 import Foundation
 import SwiftUI
 
+class SrfMetadataEditor: ObservableObject {
+    private let srfLibrary: SrfLibrary
+
+    @Published var isPresented: Bool = false
+    @Published var editingJsonText: String = ""
+    private var editingMetaUrl: URL? = nil
+
+    init(srfLibrary: SrfLibrary) {
+        self.srfLibrary = srfLibrary
+    }
+
+    func edit(srf: Srf) {
+        let url = srf.url.appendingPathComponent(SrfLibrary.srfMetaFileName)
+        editingMetaUrl = url
+        editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
+        isPresented = true
+    }
+
+    func save() throws {
+        if let url = editingMetaUrl {
+            try srfLibrary.updateSrf(metaUrl: url, json: editingJsonText)
+            editingMetaUrl = nil
+            // TODO: ここでなんらかの更新を行わないとViewに反映されなさそう
+            isPresented = false
+        }
+    }
+}
+
 struct MetaEditorView: View {
-    @EnvironmentObject var srfLibrary: SrfLibrary
-    @Binding var isPresented: Bool
-    @Binding var editingJsonText: String
-    @Binding var editingMetaUrl: URL?
+    @ObservedObject var srfMetadataEditor: SrfMetadataEditor
     @State private var editingAlertText: String = ""
 
     private func save() {
         do {
-            if let url = editingMetaUrl {
-                try srfLibrary.updateSrf(metaUrl: url, json: editingJsonText)
-                // FIXME: これで全てがリフレッシュされてしまいAlbumViewが初期化されてしまう...
-                srfLibrary.loadLibrary()
-                editingAlertText = ""
-                editingMetaUrl = nil
-                isPresented = false
-            }
+            try srfMetadataEditor.save()
         } catch {
             print(error.localizedDescription)
             editingAlertText = "Save failed."
@@ -30,7 +48,7 @@ struct MetaEditorView: View {
                 .font(.headline)
             Text(editingAlertText)
                 .foregroundColor(.red)
-            PlainNSTextView(text: $editingJsonText)
+            PlainNSTextView(text: $srfMetadataEditor.editingJsonText)
                 .font(.system(.body, design: .monospaced))
                 .border(Color.gray)
                 .padding()

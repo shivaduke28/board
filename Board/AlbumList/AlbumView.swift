@@ -3,11 +3,9 @@ import SwiftUI
 struct AlbumView: View {
     @EnvironmentObject var srfLibrary: SrfLibrary
     @EnvironmentObject var audioPlayer: AudioPlayerModel
-    @Binding var selectedAlbumId: AlbumId?
+    @EnvironmentObject private var srfMetadataEditor: SrfMetadataEditor
 
-    @State private var isEditing: Bool = false
-    @State private var editingMetaUrl: URL? = nil
-    @State private var editingJsonText: String = ""
+    @Binding var selectedAlbumId: AlbumId?
 
     var album: Album? {
         guard let id = selectedAlbumId else {
@@ -75,29 +73,14 @@ struct AlbumView: View {
                 }.width(60)
                 TableColumn("") { srf in
                     Button {
-                        edit(srf: srf)
+                        srfMetadataEditor.edit(srf: srf)
                     } label: {
                         Label("", systemImage: "pencil").labelStyle(.iconOnly)
                     }
                     .buttonStyle(.plain)
                     .frame(width: 20)
                 }.width(20)
-            }.sheet(isPresented: $isEditing) {
-                MetaEditorView(
-                    isPresented: $isEditing,
-                    editingJsonText: $editingJsonText,
-                    editingMetaUrl: $editingMetaUrl
-                )
             }
         }
-    }
-
-    // track list と処理が重複しているのでmeta編集用のモデルを作るとよさそう
-    // => sheetをContentViewにつけてしまうという手もあるかもしれない
-    private func edit(srf: Srf) {
-        let url = srf.url.appendingPathComponent(SrfLibrary.srfMetaFileName)
-        editingMetaUrl = url
-        editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
-        isEditing = true
     }
 }

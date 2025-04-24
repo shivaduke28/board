@@ -1,9 +1,10 @@
 import SwiftUI
 
 struct TrackListView: View {
-    @EnvironmentObject var srfLibrary: SrfLibrary
-    @EnvironmentObject var audioPlayer: AudioPlayerModel
-    
+    @EnvironmentObject private var srfLibrary: SrfLibrary
+    @EnvironmentObject private var audioPlayer: AudioPlayerModel
+    @EnvironmentObject private var srfMetadataEditor: SrfMetadataEditor
+
     @Binding var selectedAlbumId: AlbumId?
     @Binding var selectedSidebarItem: SidebarItem
 
@@ -61,7 +62,7 @@ struct TrackListView: View {
             }.width(60)
             TableColumn("") { srf in
                 Button {
-                    edit(srf: srf)
+                    srfMetadataEditor.edit(srf: srf)
                 } label: {
                     Label("", systemImage: "pencil").labelStyle(.iconOnly)
                 }
@@ -69,19 +70,5 @@ struct TrackListView: View {
                 .frame(width: 20)
             }.width(20)
         }
-        .sheet(isPresented: $isEditing) {
-            MetaEditorView(
-                isPresented: $isEditing,
-                editingJsonText: $editingJsonText,
-                editingMetaUrl: $editingMetaUrl
-            )
-        }
-    }
-
-    private func edit(srf: Srf) {
-        let url = srf.url.appendingPathComponent(SrfLibrary.srfMetaFileName)
-        editingMetaUrl = url
-        editingJsonText = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
-        isEditing = true
     }
 }
