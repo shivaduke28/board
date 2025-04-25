@@ -65,7 +65,8 @@ struct AudioPlayerView: View {
         artist: "long long artist name",
         artists: ["Test Artist"],
         remixers: ["Test remixer"],
-        duration: 100
+        duration: 100,
+        trackNumber: 5,
     )
     let srfObject = Srf(
         metadata: srfMeta,

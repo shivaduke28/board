@@ -19,6 +19,7 @@ struct SrfMetadata: Codable {
     let artists: [String]
     let remixers: [String]
     let duration: TimeInterval
+    let trackNumber: Int?
 }
 
 typealias AlbumId = UUID

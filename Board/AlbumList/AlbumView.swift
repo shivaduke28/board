@@ -17,7 +17,7 @@ struct AlbumView: View {
     var srfs: [Srf] {
         srfLibrary.srfs.values.filter { srf in
             srf.album.id == selectedAlbumId
-        }
+        }.sorted{ ($0.metadata.trackNumber ?? 0) < ($1.metadata.trackNumber ?? 0)}
     }
 
     var body: some View {
@@ -48,6 +48,9 @@ struct AlbumView: View {
                     }
                     .buttonStyle(.plain)
                     .frame(width: 20)
+                }.width(20)
+                TableColumn("#") { srf in
+                    Text(srf.metadata.trackNumber.map(String.init) ?? "")
                 }.width(20)
                 TableColumn("Title") { srf in
                     Text(srf.metadata.title)

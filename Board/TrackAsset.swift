@@ -8,4 +8,5 @@ struct TrackAsset {
     let duration: TimeInterval
     let albumArtist: String?
     let year: Int?
+    let trackNumber: Int?
 }

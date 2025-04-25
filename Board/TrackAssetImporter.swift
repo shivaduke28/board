@@ -37,7 +37,7 @@ class TrackAssetImporter: ObservableObject {
                         await self.srfLibrary.importTrackAsset(trackAsset)
                     }
                 }
-                await self.srfLibrary.loadLibrary()
+                self.srfLibrary.loadLibrary()
             }
         }
     }
@@ -53,6 +53,7 @@ class TrackAssetImporter: ObservableObject {
         var album: String? = nil
         var albumArtist: String? = nil
         var year: Int? = nil
+        var trackNumber: Int? = nil
 
         // metadataとしては取得できないがcommonMetadataで取得できるケースがあるのでこちらを優先する
         let commonMedadata = try await asset.load(.commonMetadata)
@@ -78,6 +79,9 @@ class TrackAssetImporter: ObservableObject {
             case AVMetadataKey.id3MetadataKeyYear,
                 AVMetadataKey.id3MetadataKeyRecordingTime:
                 year = try await item.load(.stringValue).flatMap(Int.init)
+            case AVMetadataKey.id3MetadataKeyTrackNumber:
+                let stringValue = try await item.load(.stringValue)
+                trackNumber = extractLeadingNumberAsInt(stringValue)
             default:
                 break
             }
@@ -90,7 +94,14 @@ class TrackAssetImporter: ObservableObject {
             album: album,
             duration: duration,
             albumArtist: albumArtist,
-            year: year
+            year: year,
+            trackNumber: trackNumber
         )
+    }
+
+    static func extractLeadingNumberAsInt(_ input: String?) -> Int? {
+        guard let input = input else { return nil }
+        guard let match = input.firstMatch(of: /^(\d+)/) else { return nil }
+        return Int(String(match.1))
     }
 }
