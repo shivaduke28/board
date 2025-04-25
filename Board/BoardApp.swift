@@ -7,7 +7,7 @@ struct BoardApp: App {
         let audioPlayerController = AudioPlayerController(player: audioPlayerModel)
         let srfLibrary = SrfLibrary()
         let trackAssetImporter = TrackAssetImporter(srfLibrary: srfLibrary)
-        let srfMetadataEditor = SrfMetadataEditor(srfLibrary: srfLibrary)
+        let srfMetadataEditor = MetadataEditor(srfLibrary: srfLibrary)
         WindowGroup {
             ContentView()
                 .environmentObject(audioPlayerModel)

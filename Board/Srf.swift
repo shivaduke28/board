@@ -28,6 +28,9 @@ struct Album: Identifiable {
     var id = AlbumId()
     let metadata: AlbumMetadata
     let url: URL
+    var metadataUrl: URL {
+        url.appendingPathComponent(SrfLibrary.albumMetaFileName)
+    }
 }
 
 struct AlbumMetadata: Codable {

@@ -200,6 +200,18 @@ class SrfLibrary: ObservableObject {
         let encoded = try encoder.encode(meta)
         try encoded.write(to: metaUrl)
     }
+    
+    func updateAlbum(metaUrl: URL, json: String) throws {
+        guard let jsonData = json.data(using: .utf8) else {
+            fatalError("文字列のData変換に失敗しました")
+        }
+
+        let meta = try JSONDecoder().decode(AlbumMetadata.self, from: jsonData)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let encoded = try encoder.encode(meta)
+        try encoded.write(to: metaUrl)
+    }
 
     private static func createSrfMetaData(asset: TrackAsset, albumId: AlbumId)
         -> SrfMetadata

@@ -5,7 +5,7 @@ import UniformTypeIdentifiers
 struct ContentView: View {
     @EnvironmentObject var trackAssetImporter: TrackAssetImporter
     @EnvironmentObject var srfLibrary: SrfLibrary
-    @EnvironmentObject var srfMetadataEditor: SrfMetadataEditor
+    @EnvironmentObject var srfMetadataEditor: MetadataEditor
     @State private var selectedSideBarItem: SidebarItem = .tracks
     @State private var selectedAlbumId: AlbumId?
 
@@ -45,7 +45,7 @@ struct ContentView: View {
             srfLibrary.loadLibrary()
         }
         .sheet(isPresented: $srfMetadataEditor.isPresented) {
-            MetaEditorView(srfMetadataEditor: srfMetadataEditor)
+            MetaEditorView(metadataEditor: srfMetadataEditor)
         }
     }
 

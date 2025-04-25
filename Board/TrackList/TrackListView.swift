@@ -3,7 +3,7 @@ import SwiftUI
 struct TrackListView: View {
     @EnvironmentObject private var srfLibrary: SrfLibrary
     @EnvironmentObject private var audioPlayer: AudioPlayerController
-    @EnvironmentObject private var srfMetadataEditor: SrfMetadataEditor
+    @EnvironmentObject private var srfMetadataEditor: MetadataEditor
 
     @Binding var selectedAlbumId: AlbumId?
     @Binding var selectedSidebarItem: SidebarItem

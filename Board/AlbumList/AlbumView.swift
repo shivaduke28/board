@@ -3,7 +3,7 @@ import SwiftUI
 struct AlbumView: View {
     @EnvironmentObject var srfLibrary: SrfLibrary
     @EnvironmentObject var audioPlayer: AudioPlayerController
-    @EnvironmentObject private var srfMetadataEditor: SrfMetadataEditor
+    @EnvironmentObject private var metadataEditor: MetadataEditor
 
     @Binding var selectedAlbumId: AlbumId?
 
@@ -17,7 +17,9 @@ struct AlbumView: View {
     var srfs: [Srf] {
         srfLibrary.srfs.values.filter { srf in
             srf.album.id == selectedAlbumId
-        }.sorted{ ($0.metadata.trackNumber ?? 0) < ($1.metadata.trackNumber ?? 0)}
+        }.sorted {
+            ($0.metadata.trackNumber ?? 0) < ($1.metadata.trackNumber ?? 0)
+        }
     }
 
     var body: some View {
@@ -30,6 +32,14 @@ struct AlbumView: View {
                 Text(album.metadata.artist)
                     .font(.title)
                 Text(album.metadata.year.toText)
+
+                Button {
+                    metadataEditor.edit(album: album)
+                } label: {
+                    Label("", systemImage: "pencil").labelStyle(.iconOnly)
+                }
+                .buttonStyle(.plain)
+                .frame(width: 20)
             }
             HStack {
                 ForEach(album.metadata.artists, id: \.self) { artist in
@@ -77,7 +87,7 @@ struct AlbumView: View {
                 }.width(60)
                 TableColumn("") { srf in
                     Button {
-                        srfMetadataEditor.edit(srf: srf)
+                        metadataEditor.edit(srf: srf)
                     } label: {
                         Label("", systemImage: "pencil").labelStyle(.iconOnly)
                     }
