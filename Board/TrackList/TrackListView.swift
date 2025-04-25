@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TrackListView: View {
     @EnvironmentObject private var srfLibrary: SrfLibrary
-    @EnvironmentObject private var audioPlayer: AudioPlayerModel
+    @EnvironmentObject private var audioPlayer: AudioPlayerController
     @EnvironmentObject private var srfMetadataEditor: SrfMetadataEditor
 
     @Binding var selectedAlbumId: AlbumId?
@@ -21,8 +21,7 @@ struct TrackListView: View {
         Table(srfs) {
             TableColumn("") { srf in
                 Button {
-                    audioPlayer.load(srf)
-                    audioPlayer.play()
+                    audioPlayer.load(srf: srf)
                 } label: {
                     Label("", systemImage: "play.fill").labelStyle(.iconOnly)
                 }

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AlbumView: View {
     @EnvironmentObject var srfLibrary: SrfLibrary
-    @EnvironmentObject var audioPlayer: AudioPlayerModel
+    @EnvironmentObject var audioPlayer: AudioPlayerController
     @EnvironmentObject private var srfMetadataEditor: SrfMetadataEditor
 
     @Binding var selectedAlbumId: AlbumId?
@@ -40,8 +40,7 @@ struct AlbumView: View {
             Table(srfs) {
                 TableColumn("") { srf in
                     Button {
-                        audioPlayer.load(srf)
-                        audioPlayer.play()
+                        audioPlayer.load(srf: srf)
                     } label: {
                         Label("", systemImage: "play.fill").labelStyle(
                             .iconOnly

@@ -81,6 +81,6 @@ struct AudioPlayerView: View {
         url: URL(string: "https://example.com/audio.mp3")!,
         assetFileName: "audio.mp3"
     )
-    viewModel.load(srfObject)
+    viewModel.load(srf: srfObject)
     return AudioPlayerView().environmentObject(viewModel)
 }

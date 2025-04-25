@@ -14,7 +14,7 @@ class AudioPlayerModel: ObservableObject {
 
     private var timer: Timer?
 
-    func load(_ srf: Srf) {
+    func load(srf: Srf, play: Bool = true) {
         srfObject = srf
         audioPlayer?.stop()
         let url = srf.url.appendingPathComponent(srf.assetFileName)
@@ -25,6 +25,9 @@ class AudioPlayerModel: ObservableObject {
         album = srf.album.metadata.title
         audioPlayer?.volume = volume
         currentTime = 0
+        if play {
+            self.play()
+        }
     }
 
     func play() {
@@ -42,7 +45,6 @@ class AudioPlayerModel: ObservableObject {
     }
 
     func seek(_ time: TimeInterval) {
-        print("seek ", time)
         audioPlayer?.currentTime = time
         currentTime = time
     }
