@@ -29,7 +29,7 @@ struct TrackListView: View {
                 .frame(width: 20)
             }.width(20)
             TableColumn("#") { srf in
-                Text(srf.metadata.trackNumber.map(String.init) ?? "")
+                Text(srf.metadata.trackNumber.toText)
             }.width(20)
 
             TableColumn("Title") { srf in
@@ -62,7 +62,7 @@ struct TrackListView: View {
                 Text(srf.metadata.duration.mmss)
             }.width(60)
             TableColumn("Year") { srf in
-                Text(srf.album.metadata.year.map(String.init) ?? "")
+                Text(srf.album.metadata.year.toText)
             }.width(60)
             TableColumn("") { srf in
                 Button {

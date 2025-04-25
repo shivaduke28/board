@@ -29,7 +29,7 @@ struct AlbumView: View {
                     .font(.largeTitle)
                 Text(album.metadata.artist)
                     .font(.title)
-                Text(album.metadata.year.map(String.init) ?? "")
+                Text(album.metadata.year.toText)
             }
             HStack {
                 ForEach(album.metadata.artists, id: \.self) { artist in
@@ -50,7 +50,7 @@ struct AlbumView: View {
                     .frame(width: 20)
                 }.width(20)
                 TableColumn("#") { srf in
-                    Text(srf.metadata.trackNumber.map(String.init) ?? "")
+                    Text(srf.metadata.trackNumber.toText)
                 }.width(20)
                 TableColumn("Title") { srf in
                     Text(srf.metadata.title)
