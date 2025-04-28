@@ -12,14 +12,32 @@ struct TrackListView: View {
 
     @Binding var selectedAlbumId: AlbumId?
     @Binding var selectedSidebarItem: SidebarItem
-
+    @State private var filterText = ""
     @State private var isEditing: Bool = false
     @State private var editingMetaUrl: URL? = nil
     @State private var editingJsonText: String = ""
 
+    static func filterByText(srf: Srf, filterText: String) -> Bool {
+        if filterText.isEmpty {
+            return true
+        }
+        return srf.metadata.title.localizedCaseInsensitiveContains(filterText)
+            || srf.metadata.artist.localizedCaseInsensitiveContains(filterText)
+            || srf.album.metadata.title.localizedCaseInsensitiveContains(
+                filterText
+            )
+            || false
+    }
+
     var body: some View {
         let _ = Self._printChanges()
-        let srfs = Array(srfLibrary.srfs.values).sorted(using: sortOrder)
+        let srfs = Array(
+            srfLibrary.srfs.values
+                .filter {
+                    TrackListView.filterByText(srf: $0, filterText: filterText)
+                }
+        )
+        .sorted(using: sortOrder)
         Table(srfs, sortOrder: $sortOrder) {
             TableColumn("") { srf in
                 Button {
@@ -71,6 +89,8 @@ struct TrackListView: View {
                 .frame(width: 20)
             }.width(20)
         }
+        // TODO: isPresentedを操作することでフォーカスを切り替えられるのでSceneで.commandsを使って⌘+Fでフォーカスするとよさそう
+        .searchable(text: $filterText)
         // ソート時にハングしないようにするworkaround
         // https://blog.dnpp.org/broken_swiftui_table_on_macos
         .id(sortOrder)
