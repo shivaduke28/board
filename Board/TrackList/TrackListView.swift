@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct TrackListView: View {
+    @State private var sortOrder = [
+        KeyPathComparator(\Srf.metadata.title),
+        KeyPathComparator(\Srf.metadata.artist),
+        KeyPathComparator(\Srf.album.metadata.title),
+    ]
     @EnvironmentObject private var srfLibrary: SrfLibrary
     @EnvironmentObject private var audioPlayer: AudioPlayerController
     @EnvironmentObject private var srfMetadataEditor: MetadataEditor
@@ -12,13 +17,10 @@ struct TrackListView: View {
     @State private var editingMetaUrl: URL? = nil
     @State private var editingJsonText: String = ""
 
-    var srfs: [Srf] {
-        Array(srfLibrary.srfs.values)
-    }
-
     var body: some View {
         let _ = Self._printChanges()
-        Table(srfs) {
+        let srfs = Array(srfLibrary.srfs.values).sorted(using: sortOrder)
+        Table(srfs, sortOrder: $sortOrder) {
             TableColumn("") { srf in
                 Button {
                     audioPlayer.load(srf: srf)
@@ -31,13 +33,8 @@ struct TrackListView: View {
             TableColumn("#") { srf in
                 Text(srf.metadata.trackNumber.toText)
             }.width(20)
-
-            TableColumn("Title") { srf in
-                Text(srf.metadata.title)
-            }
-            TableColumn("Artist") { srf in
-                Text(srf.metadata.artist)
-            }
+            TableColumn("Title", value: \.metadata.title)
+            TableColumn("Artist", value: \.metadata.artist)
             TableColumn("Artists") { srf in
                 HStack {
                     ForEach(srf.metadata.artists, id: \.self) { artist in
@@ -45,7 +42,7 @@ struct TrackListView: View {
                     }
                 }
             }
-            TableColumn("Album") { srf in
+            TableColumn("Album", value: \.album.metadata.title) { srf in
                 Button(srf.album.metadata.title) {
                     selectedAlbumId = srf.album.id
                     selectedSidebarItem = .albums
@@ -74,5 +71,8 @@ struct TrackListView: View {
                 .frame(width: 20)
             }.width(20)
         }
+        // ソート時にハングしないようにするworkaround
+        // https://blog.dnpp.org/broken_swiftui_table_on_macos
+        .id(sortOrder)
     }
 }
