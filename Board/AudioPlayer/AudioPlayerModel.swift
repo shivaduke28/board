@@ -10,7 +10,7 @@ class AudioPlayerModel: ObservableObject {
     @Published var title: String = ""
     @Published var artist: String = ""
     @Published var album: String = ""
-    @Published var volume: Float = 1
+    @Published var volume: Float = 0.5
 
     private var timer: Timer?
 
